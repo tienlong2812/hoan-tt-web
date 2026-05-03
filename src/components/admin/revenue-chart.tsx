@@ -4,9 +4,11 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recha
 
 export function RevenueChart({ data }: { data: any[] }) {
   // Aggregate data by date
-  // Expect data to have created_at and total_amount
+  // Expect data to have order_date and total_amount
   const aggregatedData = data.reduce((acc: any, curr) => {
-    const date = new Date(curr.created_at).toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' });
+    const dateStr = curr.order_date || curr.created_at; // Fallback just in case
+    if (!dateStr) return acc;
+    const date = new Date(dateStr).toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' });
     if (!acc[date]) {
       acc[date] = { date, revenue: 0 };
     }

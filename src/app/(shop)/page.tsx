@@ -5,6 +5,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, ShieldCheck, Truck, Zap } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -81,30 +82,44 @@ export default async function HomePage() {
             <h2 className="text-3xl font-bold tracking-tight mb-2">Thương Hiệu Nổi Bật</h2>
             <p className="text-muted-foreground">Khám phá các sản phẩm từ những đối tác hàng đầu thế giới</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {topBrands?.map((brand) => {
-              const slug = brand.brand_name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-              return (
-                <Link key={brand.brand_id} href={`/products?brand=${slug}`}>
-                  <Card className="hover:border-primary/50 transition-colors bg-white hover:shadow-md h-full cursor-pointer overflow-hidden border border-border/50 group">
-                    <CardContent className="p-6 md:p-8 flex items-center justify-center h-full min-h-[140px]">
-                      {brand.logo_url ? (
-                        <img 
-                          src={brand.logo_url} 
-                          alt={brand.brand_name} 
-                          className="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" 
-                        />
-                      ) : (
-                        <h3 className="text-xl md:text-2xl font-bold text-primary tracking-tight uppercase group-hover:scale-105 transition-transform">
-                          {brand.brand_name}
-                        </h3>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full max-w-[calc(100vw-3rem)] md:max-w-full mx-auto"
+          >
+            <CarouselContent className="-ml-4">
+              {topBrands?.map((brand) => {
+                const slug = brand.brand_name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                return (
+                  <CarouselItem key={brand.brand_id} className="pl-4 basis-1/2 md:basis-1/4 lg:basis-1/5">
+                    <Link href={`/products?brand=${slug}`} className="block h-full">
+                      <Card className="hover:border-primary/50 transition-colors bg-white hover:shadow-md h-full cursor-pointer overflow-hidden border border-border/50 group">
+                        <CardContent className="p-6 md:p-8 flex items-center justify-center h-full min-h-[140px]">
+                          {brand.logo_url ? (
+                            <img 
+                              src={brand.logo_url} 
+                              alt={brand.brand_name} 
+                              className="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" 
+                            />
+                          ) : (
+                            <h3 className="text-xl md:text-2xl font-bold text-primary tracking-tight uppercase group-hover:scale-105 transition-transform text-center">
+                              {brand.brand_name}
+                            </h3>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </CarouselItem>
+                );
+              })}
+            </CarouselContent>
+            <div className="hidden md:block">
+              <CarouselPrevious className="-left-6 lg:-left-12" />
+              <CarouselNext className="-right-6 lg:-right-12" />
+            </div>
+          </Carousel>
         </div>
       </section>
 

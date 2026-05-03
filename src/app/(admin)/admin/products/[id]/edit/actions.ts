@@ -114,9 +114,9 @@ export async function updateProductAction(formData: FormData) {
   if (galleryFiles && galleryFiles.length > 0) {
     const galleryInserts = [];
     
-    // Get current max display_order
-    const { data: existingGallery } = await supabase.from('product_gallery').select('display_order').eq('product_id', product_id).order('display_order', { ascending: false }).limit(1);
-    let startOrder = existingGallery && existingGallery.length > 0 ? existingGallery[0].display_order + 1 : 0;
+    // Get current max sort_order
+    const { data: existingGallery } = await supabase.from('product_gallery').select('sort_order').eq('product_id', product_id).order('sort_order', { ascending: false }).limit(1);
+    let startOrder = existingGallery && existingGallery.length > 0 ? existingGallery[0].sort_order + 1 : 0;
 
     for (let i = 0; i < galleryFiles.length; i++) {
       const file = galleryFiles[i];
@@ -147,13 +147,16 @@ export async function updateProductAction(formData: FormData) {
         galleryInserts.push({
           product_id: product_id,
           image_url: publicUrlData.publicUrl,
-          display_order: startOrder + i
+          sort_order: startOrder + i
         });
       }
     }
     
     if (galleryInserts.length > 0) {
-      await supabase.from('product_gallery').insert(galleryInserts);
+      const { error: galleryInsertError } = await supabase.from('product_gallery').insert(galleryInserts);
+      if (galleryInsertError) {
+        console.error("GALLERY INSERT ERROR:", galleryInsertError);
+      }
     }
   }
 

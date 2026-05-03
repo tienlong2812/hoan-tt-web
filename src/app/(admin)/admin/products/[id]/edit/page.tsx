@@ -19,12 +19,14 @@ export default async function EditProductPage(props: { params: Promise<{ id: str
     { data: product, error: prodErr },
     { data: brands },
     { data: categories },
-    { data: variants }
+    { data: variants },
+    { data: gallery }
   ] = await Promise.all([
     supabase.from('products').select('*').eq('product_id', params.id).single(),
     supabase.from('brands').select('*'),
     supabase.from('categories').select('*'),
-    supabase.from('product_variants').select('*').eq('product_id', params.id).order('variant_id', { ascending: true })
+    supabase.from('product_variants').select('*').eq('product_id', params.id).order('variant_id', { ascending: true }),
+    supabase.from('product_gallery').select('*').eq('product_id', params.id).order('sort_order', { ascending: true })
   ]);
 
   if (prodErr || !product) {
@@ -129,6 +131,15 @@ export default async function EditProductPage(props: { params: Promise<{ id: str
 
               <div className="border p-4 rounded-lg bg-muted/10">
                 <Label htmlFor="gallery" className="font-semibold text-primary mb-2 block">Thêm thư viện ảnh</Label>
+                {gallery && gallery.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    {gallery.map((g: any) => (
+                      <div key={g.image_id} className="relative group">
+                        <img src={g.image_url} className="w-20 h-20 object-cover rounded border" alt="Gallery image" />
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <Input id="gallery" name="gallery" type="file" accept="image/*" multiple className="cursor-pointer bg-white" />
                 <p className="text-xs text-muted-foreground mt-2">Ảnh tải lên sẽ được thêm vào thư viện hiện tại.</p>
               </div>

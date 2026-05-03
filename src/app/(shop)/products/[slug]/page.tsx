@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
 import { ProductGallery } from '@/components/product/product-gallery';
@@ -47,7 +48,32 @@ export default async function ProductDetailPage({
     .eq('product_id', product.product_id)
     .order('variant_id', { ascending: true });
 
-  const images = gallery && gallery.length > 0 ? gallery.map(g => g.image_url) : (product.thumbnail_url ? [product.thumbnail_url] : []);
+  // Fetch Recommended Products (same brand or category, excluding current)
+  let orQuery = '';
+  if (product.brand_id && product.category_id) {
+    orQuery = `brand_id.eq.${product.brand_id},category_id.eq.${product.category_id}`;
+  } else if (product.brand_id) {
+    orQuery = `brand_id.eq.${product.brand_id}`;
+  } else if (product.category_id) {
+    orQuery = `category_id.eq.${product.category_id}`;
+  }
+
+  let recommendedProducts: any[] = [];
+  if (orQuery) {
+    const { data: recs } = await supabase
+      .from('products')
+      .select('*, brands(brand_name)')
+      .eq('status', 'active')
+      .neq('product_id', product.product_id)
+      .or(orQuery)
+      .limit(4);
+    if (recs) recommendedProducts = recs;
+  }
+
+  const images = [
+    ...(product.thumbnail_url ? [product.thumbnail_url] : []),
+    ...(gallery ? gallery.map(g => g.image_url) : [])
+  ];
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
@@ -126,6 +152,64 @@ export default async function ProductDetailPage({
           <ReviewForm productId={product.product_id} isAuthenticated={!!user} />
         </div>
       </div>
+
+      {/* Recommended Products */}
+      {recommendedProducts.length > 0 && (
+        <div className="mt-24 pt-10 border-t">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold tracking-tight">Đề xuất cho bạn</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {recommendedProducts.map((recProd) => (
+              <Link key={recProd.product_id} href={`/products/${recProd.slug}`}>
+                <Card className="group overflow-hidden border border-border/60 hover:border-primary/40 focus-within:ring-2 focus-within:ring-primary transition-all duration-300 bg-white hover:shadow-xl rounded-xl h-full">
+                  <div className="aspect-square relative overflow-hidden bg-[#f8f9fa] flex items-center justify-center p-4">
+                    {recProd.discount_price && (
+                      <div className="absolute top-3 left-3 z-10 bg-[#ff4e52] text-white text-[11px] font-extrabold px-2.5 py-1 rounded-sm tracking-wider shadow-sm uppercase">
+                        Giảm Giá
+                      </div>
+                    )}
+                    {recProd.thumbnail_url ? (
+                      <img 
+                        src={recProd.thumbnail_url} 
+                        alt={recProd.product_name}
+                        className="object-contain w-full h-full mix-blend-multiply group-hover:scale-110 transition-transform duration-500 ease-out"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground/30 bg-muted/10 text-sm font-medium rounded-lg">
+                        No Image
+                      </div>
+                    )}
+                    
+                    {/* Quick Add Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-t from-black/50 to-transparent">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-md shadow-lg" size="sm">
+                          Xem Chi Tiết
+                        </Button>
+                    </div>
+                  </div>
+                  <CardContent className="p-4 md:p-5 flex flex-col gap-1.5 bg-white z-20 relative">
+                    {recProd.brands && <p className="text-[11px] font-bold text-muted-foreground/80 uppercase tracking-widest">{(recProd.brands as any).brand_name}</p>}
+                    <h3 className="font-semibold text-sm md:text-[15px] leading-tight line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors text-foreground">
+                      {recProd.product_name}
+                    </h3>
+                    <div className="flex items-end gap-2 mt-2">
+                      {recProd.discount_price ? (
+                        <>
+                          <span className="font-bold text-lg md:text-xl text-[#d95115]">{recProd.discount_price.toLocaleString('vi-VN')} ₫</span>
+                          <span className="text-[13px] text-muted-foreground line-through font-medium mb-0.5">{recProd.price.toLocaleString('vi-VN')} ₫</span>
+                        </>
+                      ) : (
+                        <span className="font-bold text-lg md:text-xl text-[#d95115]">{recProd.price.toLocaleString('vi-VN')} ₫</span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

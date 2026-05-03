@@ -11,8 +11,16 @@ import { cookies } from 'next/headers';
 export async function Header() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  
   const { data: categories } = await supabase.from('categories').select('*').order('category_id').limit(4);
+
+  const { data: { user } } = await supabase.auth.getUser();
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase.from('users').select('role').eq('user_id', user.id).single();
+    if (profile && profile.role === 'admin') {
+      isAdmin = true;
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b">
@@ -87,6 +95,12 @@ export async function Header() {
             </Link>
 
             <CartBadge />
+
+            {isAdmin && (
+              <Link href="/admin" className={buttonVariants({ variant: "default", size: "sm", className: "rounded-full font-bold shadow-md hidden sm:flex ml-1" })}>
+                Trang Admin
+              </Link>
+            )}
           </div>
         </div>
 
