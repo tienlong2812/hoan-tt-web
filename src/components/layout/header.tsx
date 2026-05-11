@@ -45,6 +45,7 @@ export async function Header() {
                       {cat.category_name}
                     </Link>
                   ))}
+                  <Link href="/tin-tuc" className="text-lg font-bold hover:text-primary transition-colors">Tin Tức</Link>
                   <Link href="/about" className="text-lg font-bold hover:text-primary transition-colors">Giới Thiệu</Link>
                 </nav>
               </SheetContent>
