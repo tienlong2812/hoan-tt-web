@@ -6,6 +6,7 @@ import { Plus, Edit, Trash2, Search as SearchIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ImportExcelModal } from './import-modal';
+import { ExportProductsModal } from './export-modal';
 
 export default async function AdminProductsPage(props: { searchParams: Promise<{ q?: string; category?: string }> }) {
   const searchParams = await props.searchParams;
@@ -35,9 +36,10 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Quản lý Sản Phẩm</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <ExportProductsModal />
           <ImportExcelModal />
           <Link href="/admin/products/create">
             <Button>
@@ -116,21 +118,10 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
                       <div className="text-xs text-muted-foreground">{(p.brands as any)?.brand_name}</div>
                     </td>
                     <td className="p-4 text-right whitespace-nowrap">
-                      {p.discount_price ? (
-                        <>
-                          <div className="font-bold text-red-600">{p.discount_price.toLocaleString('vi-VN')} ₫</div>
-                          <div className="text-xs text-muted-foreground line-through">{p.price.toLocaleString('vi-VN')} ₫</div>
-                        </>
-                      ) : (
-                        <div className="font-medium">{p.price.toLocaleString('vi-VN')} ₫</div>
-                      )}
+                      <div className="font-medium">{p.base_price.toLocaleString('vi-VN')} ₫</div>
                     </td>
                     <td className="p-4 text-right">
-                      {p.stock > 0 ? (
-                        <span className="text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full text-xs">{p.stock}</span>
-                      ) : (
-                        <span className="text-red-600 font-semibold bg-red-50 px-2 py-0.5 rounded-full text-xs">0</span>
-                      )}
+                      <span className="text-muted-foreground text-xs">Xem biến thể</span>
                     </td>
                     <td className="p-4 text-center">
                       <Badge variant={p.status === 'active' ? 'default' : 'secondary'} className={p.status === 'active' ? 'bg-primary/10 text-primary hover:bg-primary/20' : ''}>

@@ -44,3 +44,21 @@ export async function updateUserStatusAction(userId: string, newStatus: string) 
 
   revalidatePath('/admin/users');
 }
+
+export async function getUsersForExport() {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .neq('status', 'deleted')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching users for export:', error);
+    throw new Error('Failed to fetch users');
+  }
+
+  return data;
+}

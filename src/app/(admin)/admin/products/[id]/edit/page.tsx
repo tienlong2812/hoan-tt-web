@@ -61,30 +61,19 @@ export default async function EditProductPage(props: { params: Promise<{ id: str
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="sku">SKU</Label>
-                <Input id="sku" name="sku" defaultValue={product.sku || ''} />
-              </div>
-              <div>
                 <Label htmlFor="origin">Xuất xứ</Label>
                 <Input id="origin" name="origin" defaultValue={product.origin || ''} />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="price">Giá (VNĐ) *</Label>
-                <Input id="price" name="price" type="number" defaultValue={product.price} required />
-              </div>
-              <div>
-                <Label htmlFor="discount_price">Giá khuyến mãi (VNĐ)</Label>
-                <Input id="discount_price" name="discount_price" type="number" defaultValue={product.discount_price || ''} />
+                <Label htmlFor="weight">Khối lượng (g)</Label>
+                <Input id="weight" name="weight" type="number" defaultValue={product.weight || ''} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="stock">Tồn kho *</Label>
-                <Input id="stock" name="stock" type="number" defaultValue={product.stock} required />
+                <Label htmlFor="base_price">Giá gốc (VNĐ) *</Label>
+                <Input id="base_price" name="base_price" type="number" defaultValue={product.base_price} required />
               </div>
               <div>
                 <Label htmlFor="status">Trạng thái</Label>

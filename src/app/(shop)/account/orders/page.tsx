@@ -67,7 +67,12 @@ export default async function OrdersPage() {
               <div className="mt-4 pt-4 border-t flex flex-col gap-2">
                 <div className="text-sm text-muted-foreground font-medium">Đặt ngày: {new Date(order.created_at).toLocaleDateString('vi-VN')}</div>
                 <div className="text-sm text-muted-foreground overflow-hidden">
-                  <pre className="font-sans whitespace-pre-wrap">{order.shipping_address}</pre>
+                  {order.receiver_name && (
+                    <span>{order.receiver_name} · {order.receiver_phone}</span>
+                  )}
+                  {order.detail_address && (
+                    <div className="mt-0.5">{order.detail_address}{order.ward ? `, ${order.ward}` : ''}, {order.district}, {order.province}</div>
+                  )}
                 </div>
               </div>
             </div>

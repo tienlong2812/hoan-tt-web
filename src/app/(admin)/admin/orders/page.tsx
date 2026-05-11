@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { updateOrderStatus } from './actions';
 import { Eye } from 'lucide-react';
 import { OrderStatusSelect } from './status-select';
+import { ExportOrdersModal } from './export-modal';
 
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
@@ -37,8 +38,8 @@ export default async function AdminOrdersPage({
       // If it's a number, search by order_id
       query = query.eq('order_id', Number(q));
     } else {
-      // Search in shipping address JSON string (covers name and phone)
-      query = query.ilike('shipping_address', `%${q}%`);
+      // Search by receiver name or phone
+      query = query.or(`receiver_name.ilike.%${q}%,receiver_phone.ilike.%${q}%`);
     }
   }
 
@@ -54,10 +55,13 @@ export default async function AdminOrdersPage({
           <p className="text-muted-foreground mt-1">Tìm thấy {orders?.length || 0} đơn hàng | Tổng: {filteredRevenue.toLocaleString('vi-VN')} ₫</p>
         </div>
         
-        <form className="flex flex-wrap items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <ExportOrdersModal />
+          <form className="flex flex-wrap items-center gap-3 flex-1 md:flex-initial">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+
               name="q" 
               defaultValue={resolvedParams.q}
               placeholder="SĐT, Tên, ID đơn..." 
@@ -76,6 +80,7 @@ export default async function AdminOrdersPage({
             </Link>
           )}
         </form>
+      </div>
       </div>
 
       <div className="border rounded-xl bg-card overflow-hidden">

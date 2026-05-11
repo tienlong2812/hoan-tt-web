@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Package, ShoppingCart, LayoutDashboard, Tags, Settings, LogOut, Tag, Users } from 'lucide-react';
+import { signoutAction } from '@/app/(auth)/actions';
 
 export function AdminSidebar() {
   return (
@@ -73,12 +74,15 @@ export function AdminSidebar() {
               <Settings className="h-4 w-4" />
               Settings
             </Link>
-            <button
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted text-left w-full"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </button>
+            <form action={signoutAction}>
+              <button
+                type="submit"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-destructive hover:bg-muted text-left w-full"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </form>
           </nav>
         </div>
       </div>

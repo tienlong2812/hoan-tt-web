@@ -6,47 +6,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { registerAction } from './actions';
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          phone_number: phoneNumber,
-        }
-      }
-    });
+    const formData = new FormData(e.currentTarget);
+    const result = await registerAction(formData);
 
-    if (error) {
-      toast.error(error.message);
+    if (result.error) {
+      toast.error(result.error);
     } else {
       toast.success('Đăng ký thành công!');
-      // Depending on Supabase settings, the user might need to verify email or is auto-logged in.
-      // Default Hoan TT behavior without email verification:
-      if (data.session) {
-        window.location.href = '/';
-      } else {
+      if (result.requiresConfirmation) {
         toast.info('Vui lòng kiểm tra email để xác nhận tài khoản.');
         router.push('/login');
+      } else {
+        window.location.href = '/';
       }
     }
+
     setLoading(false);
   };
 
@@ -59,20 +45,24 @@ export default function RegisterPage() {
       <CardContent>
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Họ và Tên</Label>
-            <Input id="fullName" type="text" placeholder="Nguyễn Văn A" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            <Label htmlFor="full_name">Họ và Tên</Label>
+            <Input id="full_name" name="full_name" type="text" placeholder="Nguyễn Văn A" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Số điện thoại</Label>
-            <Input id="phone" type="tel" placeholder="0912345678" required value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+            <Label htmlFor="username">Tên đăng nhập (Username)</Label>
+            <Input id="username" name="username" type="text" placeholder="nguyenvana" required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone_number">Số điện thoại</Label>
+            <Input id="phone_number" name="phone_number" type="tel" placeholder="0912345678" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input id="email" name="email" type="email" placeholder="m@example.com" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Mật khẩu</Label>
-            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input id="password" name="password" type="password" required />
           </div>
           <Button className="w-full" type="submit" disabled={loading}>
             {loading ? 'Đang đăng ký...' : 'Đăng Ký'}

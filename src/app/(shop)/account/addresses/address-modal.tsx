@@ -37,26 +37,32 @@ export function AddressModal() {
         </DialogHeader>
         <form action={onSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="full_name">Họ và Tên</Label>
-            <Input id="full_name" name="full_name" required placeholder="Nguyễn Văn A" />
+            <Label htmlFor="receiver_name" className="text-xs font-semibold uppercase">Họ và Tên người nhận *</Label>
+            <Input id="receiver_name" name="receiver_name" required placeholder="Nguyễn Văn A" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone_number">Số Điện Thoại</Label>
-            <Input id="phone_number" name="phone_number" required placeholder="0912345678" />
+            <Label htmlFor="receiver_phone" className="text-xs font-semibold uppercase">Số Điện Thoại *</Label>
+            <Input id="receiver_phone" name="receiver_phone" required placeholder="0912345678" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="province">Tỉnh/Thành Phố</Label>
-              <Input id="province" name="province" required />
+              <Label htmlFor="province" className="text-xs font-semibold uppercase">Tỉnh/Thành Phố *</Label>
+              <Input id="province" name="province" required placeholder="Ví dụ: Hà Nội" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="district">Quận/Huyện</Label>
-              <Input id="district" name="district" required />
+              <Label htmlFor="district" className="text-xs font-semibold uppercase">Quận/Huyện *</Label>
+              <Input id="district" name="district" required placeholder="Ví dụ: Cầu Giấy" />
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="detail_address">Địa chỉ chi tiết (Số nhà, Đường...)</Label>
-            <Input id="detail_address" name="detail_address" required />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="ward" className="text-xs font-semibold uppercase">Xã/Phường *</Label>
+              <Input id="ward" name="ward" required placeholder="Ví dụ: Dịch Vọng" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="detail_address" className="text-xs font-semibold uppercase">Địa chỉ chi tiết *</Label>
+              <Input id="detail_address" name="detail_address" required placeholder="Số nhà, tên đường..." />
+            </div>
           </div>
           <div className="pt-4 flex justify-end">
             <Button type="submit" disabled={loading}>

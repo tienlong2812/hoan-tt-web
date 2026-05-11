@@ -44,30 +44,19 @@ export default async function CreateProductPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="sku">SKU</Label>
-                <Input id="sku" name="sku" />
-              </div>
-              <div>
                 <Label htmlFor="origin">Xuất xứ</Label>
                 <Input id="origin" name="origin" />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="price">Giá (VNĐ) *</Label>
-                <Input id="price" name="price" type="number" required />
-              </div>
-              <div>
-                <Label htmlFor="discount_price">Giá khuyến mãi (VNĐ)</Label>
-                <Input id="discount_price" name="discount_price" type="number" />
+                <Label htmlFor="weight">Khối lượng (g)</Label>
+                <Input id="weight" name="weight" type="number" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="stock">Tồn kho *</Label>
-                <Input id="stock" name="stock" type="number" defaultValue="0" required />
+                <Label htmlFor="base_price">Giá gốc (VNĐ) *</Label>
+                <Input id="base_price" name="base_price" type="number" required />
               </div>
               <div>
                 <Label htmlFor="status">Trạng thái</Label>

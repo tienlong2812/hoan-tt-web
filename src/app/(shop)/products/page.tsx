@@ -58,11 +58,11 @@ export default async function ProductsPage({
   }
 
   if (resolvedSearchParams.minPrice) {
-    query = query.gte('price', resolvedSearchParams.minPrice);
+    query = query.gte('base_price', resolvedSearchParams.minPrice);
   }
 
   if (resolvedSearchParams.maxPrice) {
-    query = query.lte('price', resolvedSearchParams.maxPrice);
+    query = query.lte('base_price', resolvedSearchParams.maxPrice);
   }
 
   const [{ data: products }, { data: brands }, { data: categories }] = await Promise.all([

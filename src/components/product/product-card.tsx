@@ -12,8 +12,7 @@ interface ProductCardProps {
     product_id: number;
     product_name: string;
     slug: string;
-    price: number;
-    discount_price?: number | null;
+    base_price: number;
     thumbnail_url?: string | null;
     brands?: { brand_name: string } | null;
   };
@@ -27,8 +26,8 @@ export function ProductCard({ product }: ProductCardProps) {
     addItem({
       product_id: product.product_id,
       name: product.product_name,
-      price: product.price,
-      discount_price: product.discount_price || null,
+      price: product.base_price,
+      discount_price: null,
       quantity: 1,
       thumbnail_url: product.thumbnail_url || '',
     });
@@ -41,11 +40,6 @@ export function ProductCard({ product }: ProductCardProps) {
         <Link href={`/products/${product.slug}`} className="absolute inset-0 z-0">
           <span className="sr-only">Xem chi tiết {product.product_name}</span>
         </Link>
-          {product.discount_price && (
-            <div className="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-              SALE
-            </div>
-          )}
           {product.thumbnail_url ? (
             <img 
               src={product.thumbnail_url} 
@@ -74,14 +68,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </h3>
           </Link>
           <div className="flex items-center gap-2 mt-auto">
-            {product.discount_price ? (
-              <>
-                <span className="font-bold text-red-500">{product.discount_price.toLocaleString('vi-VN')} ₫</span>
-                <span className="text-sm text-muted-foreground line-through">{product.price.toLocaleString('vi-VN')} ₫</span>
-              </>
-            ) : (
-              <span className="font-bold text-foreground">{product.price.toLocaleString('vi-VN')} ₫</span>
-            )}
+            <span className="font-bold text-foreground">{product.base_price.toLocaleString('vi-VN')} ₫</span>
           </div>
         </CardContent>
     </Card>

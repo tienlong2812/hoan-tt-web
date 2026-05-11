@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { Badge } from '@/components/ui/badge';
 import { updateUserRoleAction, updateUserStatusAction } from './actions';
 import { Ban, Trash2, CheckCircle } from 'lucide-react';
+import { ExportUsersModal } from './export-modal';
 
 export default async function AdminUsersPage() {
   const cookieStore = await cookies();
@@ -16,11 +17,12 @@ export default async function AdminUsersPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Quản Lý Người Dùng</h1>
           <p className="text-muted-foreground mt-1">Quản lý quyền hạn và thông tin khách hàng.</p>
         </div>
+        <ExportUsersModal />
       </div>
 
       <div className="border rounded-xl bg-card overflow-hidden">

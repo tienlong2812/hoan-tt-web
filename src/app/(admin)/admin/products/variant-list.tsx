@@ -11,21 +11,24 @@ type Variant = {
   variant_name: string;
   sku: string;
   price: number;
+  discount_price: number | null;
   stock: number;
+  weight: number | null;
+  status: string;
 };
 
 export function VariantList({ initialVariants = [] }: { initialVariants?: Variant[] }) {
   const [variants, setVariants] = useState<Variant[]>(initialVariants);
 
   const addVariant = () => {
-    setVariants([...variants, { variant_name: '', sku: '', price: 0, stock: 0 }]);
+    setVariants([...variants, { variant_name: '', sku: '', price: 0, discount_price: null, stock: 0, weight: null, status: 'active' }]);
   };
 
   const removeVariant = (index: number) => {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
-  const updateVariant = (index: number, field: keyof Variant, value: string | number) => {
+  const updateVariant = (index: number, field: keyof Variant, value: string | number | null) => {
     const newVariants = [...variants];
     newVariants[index] = { ...newVariants[index], [field]: value };
     setVariants(newVariants);
@@ -47,8 +50,8 @@ export function VariantList({ initialVariants = [] }: { initialVariants?: Varian
 
       <div className="space-y-4 mt-4">
         {variants.map((v, index) => (
-          <div key={index} className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20 relative group">
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div key={index} className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20 relative group">
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <Label className="text-xs">Tên phân loại *</Label>
                 <Input 
@@ -68,6 +71,14 @@ export function VariantList({ initialVariants = [] }: { initialVariants?: Varian
                 />
               </div>
               <div className="space-y-1">
+                <Label className="text-xs">Giá KM (VNĐ)</Label>
+                <Input 
+                  type="number" 
+                  value={v.discount_price ?? ''} 
+                  onChange={(e) => updateVariant(index, 'discount_price', e.target.value ? Number(e.target.value) : null)} 
+                />
+              </div>
+              <div className="space-y-1">
                 <Label className="text-xs">SKU</Label>
                 <Input 
                   value={v.sku} 
@@ -80,6 +91,14 @@ export function VariantList({ initialVariants = [] }: { initialVariants?: Varian
                   type="number" 
                   value={v.stock} 
                   onChange={(e) => updateVariant(index, 'stock', Number(e.target.value))} 
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Khối lượng (g)</Label>
+                <Input 
+                  type="number" 
+                  value={v.weight ?? ''} 
+                  onChange={(e) => updateVariant(index, 'weight', e.target.value ? Number(e.target.value) : null)} 
                 />
               </div>
             </div>

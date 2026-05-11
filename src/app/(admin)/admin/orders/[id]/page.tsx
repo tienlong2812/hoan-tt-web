@@ -28,7 +28,15 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
     .select('*, products(product_name, thumbnail_url), product_variants(variant_name)')
     .eq('order_id', order.order_id);
 
-  const shippingAddr = JSON.parse(order.shipping_address || '{}');
+  // Address fields are now stored directly on the order row
+  const shippingAddr = {
+    receiver_name: order.receiver_name,
+    receiver_phone: order.receiver_phone,
+    province: order.province,
+    district: order.district,
+    ward: order.ward,
+    detail_address: order.detail_address,
+  };
 
   const statusMap: Record<string, string> = {
     'pending': 'Chờ xác nhận',

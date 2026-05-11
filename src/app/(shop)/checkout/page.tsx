@@ -87,7 +87,7 @@ export default function CheckoutPage() {
               >
                 {addresses.map((addr: any) => (
                   <option key={addr.address_id} value={addr.address_id.toString()}>
-                    {addr.full_name} - {addr.phone_number} ({addr.detail_address}, {addr.province})
+                    {addr.receiver_name} - {addr.receiver_phone} ({addr.detail_address}, {addr.province})
                   </option>
                 ))}
                 <option value="new">+ Nhập địa chỉ mới</option>
@@ -96,33 +96,41 @@ export default function CheckoutPage() {
           )}
 
           <form id="checkout-form" action={onSubmit} className="space-y-6">
+            <input type="hidden" name="address_id" value={selectedAddressId} />
             {selectedAddressId === 'new' ? (
               <>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="receiver_name">Họ và Tên</Label>
-                    <Input id="receiver_name" name="receiver_name" required placeholder="Nguyễn Văn A" />
+                    <Label htmlFor="receiver_name" className="text-sm font-semibold uppercase tracking-wide">Họ và tên *</Label>
+                    <Input id="receiver_name" name="receiver_name" required placeholder="Nhập họ và tên người nhận" className="h-11" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="receiver_phone">Số Điện Thoại</Label>
-                    <Input id="receiver_phone" name="receiver_phone" required placeholder="0912345678" />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="province">Tỉnh/Thành Phố</Label>
-                    <Input id="province" name="province" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="district">Quận/Huyện</Label>
-                    <Input id="district" name="district" required />
-                  </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="detail_address">Địa chỉ chi tiết (Số nhà, Đường...)</Label>
-                  <Input id="detail_address" name="detail_address" required />
+                  <div className="space-y-2">
+                    <Label htmlFor="receiver_phone" className="text-sm font-semibold uppercase tracking-wide">Số điện thoại *</Label>
+                    <Input id="receiver_phone" name="receiver_phone" required placeholder="Ví dụ: 0941331046" className="h-11" />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="province" className="text-sm font-semibold uppercase tracking-wide">Tỉnh/Thành phố *</Label>
+                      <Input id="province" name="province" required placeholder="Ví dụ: Hà Nội" className="h-11" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="district" className="text-sm font-semibold uppercase tracking-wide">Quận/Huyện *</Label>
+                      <Input id="district" name="district" required placeholder="Ví dụ: Quận Hai Bà Trưng" className="h-11" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="ward" className="text-sm font-semibold uppercase tracking-wide">Xã/Phường/Thị trấn *</Label>
+                      <Input id="ward" name="ward" required placeholder="Ví dụ: Phường Đồng Tâm" className="h-11" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="detail_address" className="text-sm font-semibold uppercase tracking-wide">Địa chỉ *</Label>
+                      <Input id="detail_address" name="detail_address" required placeholder="Ví dụ: 86 ngõ 75 giải phóng" className="h-11" />
+                    </div>
+                  </div>
                 </div>
               </>
             ) : (
@@ -131,6 +139,7 @@ export default function CheckoutPage() {
                  <Input name="receiver_phone" value={addresses.find(a => a.address_id.toString() === selectedAddressId)?.phone_number || ''} readOnly />
                  <Input name="province" value={addresses.find(a => a.address_id.toString() === selectedAddressId)?.province || ''} readOnly />
                  <Input name="district" value={addresses.find(a => a.address_id.toString() === selectedAddressId)?.district || ''} readOnly />
+                 <Input name="ward" value={addresses.find(a => a.address_id.toString() === selectedAddressId)?.ward || ''} readOnly />
                  <Input name="detail_address" value={`${addresses.find(a => a.address_id.toString() === selectedAddressId)?.detail_address || ''}`.trim()} readOnly />
               </div>
             )}

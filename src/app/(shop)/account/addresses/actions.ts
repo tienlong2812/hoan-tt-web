@@ -35,10 +35,11 @@ export async function addAddress(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const full_name = formData.get('full_name') as string;
-  const phone_number = formData.get('phone_number') as string;
+  const receiver_name = formData.get('receiver_name') as string;
+  const receiver_phone = formData.get('receiver_phone') as string;
   const province = formData.get('province') as string;
   const district = formData.get('district') as string;
+  const ward = formData.get('ward') as string;
   const detail_address = formData.get('detail_address') as string;
 
   // Check if it's the first address
@@ -51,10 +52,11 @@ export async function addAddress(formData: FormData) {
 
   const { error } = await supabase.from('addresses').insert({
     user_id: user.id,
-    full_name,
-    phone_number,
+    receiver_name,
+    receiver_phone,
     province,
     district,
+    ward,
     detail_address,
     is_default
   });

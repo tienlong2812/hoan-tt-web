@@ -45,10 +45,8 @@ export async function importProductsAction(formData: FormData) {
     return {
       product_name: productName,
       slug: generateSlug(productName),
-      sku: row['sku'] || row['SKU'] || null,
-      price: parseInt(row['price'] || row['Giá']) || 0,
-      discount_price: parseInt(row['discount_price'] || row['Giá khuyến mãi']) || null,
-      stock: parseInt(row['stock'] || row['Tồn kho']) || 0,
+      base_price: parseInt(row['base_price'] || row['price'] || row['Giá']) || 0,
+      weight: parseFloat(row['weight'] || row['Khối lượng']) || null,
       status: row['status'] || row['Trạng thái'] || 'active',
       origin: row['origin'] || row['Xuất xứ'] || null,
       description: row['description'] || row['Mô tả'] || null,
@@ -70,4 +68,29 @@ export async function importProductsAction(formData: FormData) {
   }
 
   revalidatePath('/admin/products');
+}
+
+export async function getProductsForExport(filters: { q?: string; category?: string }) {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  let query = supabase
+    .from('products')
+    .select('*, brands(brand_name), categories(category_name)')
+    .order('created_at', { ascending: false });
+
+  if (filters.q) {
+    query = query.ilike('product_name', `%${filters.q}%`);
+  }
+  if (filters.category) {
+    query = query.eq('category_id', filters.category);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('Error fetching products for export:', error);
+    throw new Error('Failed to fetch products');
+  }
+
+  return data;
 }

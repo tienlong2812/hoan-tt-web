@@ -7,9 +7,12 @@ import { BuyNowButton } from '@/components/cart/buy-now-button';
 type Variant = {
   variant_id: number;
   variant_name: string;
-  sku: string;
+  sku: string | null;
   price: number;
+  discount_price?: number | null;
   stock: number;
+  weight?: number | null;
+  status?: string;
 };
 
 export function VariantSelector({ product, variants }: { product: any, variants: Variant[] }) {
@@ -20,15 +23,19 @@ export function VariantSelector({ product, variants }: { product: any, variants:
   const selectedVariant = variants.find(v => v.variant_id === selectedVariantId);
 
   // Determine current display info
-  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
-  const currentStock = selectedVariant ? selectedVariant.stock : product.stock;
-  const currentSku = selectedVariant && selectedVariant.sku ? selectedVariant.sku : product.sku;
+  // If a variant is selected: use variant price/stock/sku; 
+  // If no variants exist: use 1 as default stock to allow purchase of legacy products
   const hasVariants = variants.length > 0;
+  const currentPrice = selectedVariant ? selectedVariant.price : product.base_price;
+  const currentDiscountPrice = selectedVariant?.discount_price ?? null;
+  const currentStock = selectedVariant ? selectedVariant.stock : (hasVariants ? 0 : 1);
+  const currentSku = selectedVariant?.sku || null;
 
   // Prepare product object for cart
   const cartProduct = {
     ...product,
     price: currentPrice,
+    discount_price: currentDiscountPrice,
     stock: currentStock,
     variant_id: selectedVariant?.variant_id,
     variant_name: selectedVariant?.variant_name
@@ -44,7 +51,7 @@ export function VariantSelector({ product, variants }: { product: any, variants:
         <div className="font-medium">Tình trạng:</div>
         <div>
           {currentStock > 0 ? (
-            <span className="text-green-600 font-medium">Còn hàng ({currentStock})</span>
+            <span className="text-green-600 font-medium">Còn hàng {hasVariants ? `(${currentStock})` : ''}</span>
           ) : (
             <span className="text-red-500 font-medium">Hết hàng</span>
           )}
@@ -69,10 +76,10 @@ export function VariantSelector({ product, variants }: { product: any, variants:
       )}
 
       <div className="flex items-end gap-3 mb-8">
-        {!hasVariants && product.discount_price ? (
+        {currentDiscountPrice ? (
           <>
-            <span className="text-4xl font-bold text-red-500">{product.discount_price.toLocaleString('vi-VN')} ₫</span>
-            <span className="text-xl text-muted-foreground line-through mb-1">{product.price.toLocaleString('vi-VN')} ₫</span>
+            <span className="text-4xl font-bold text-red-500">{currentDiscountPrice.toLocaleString('vi-VN')} ₫</span>
+            <span className="text-xl text-muted-foreground line-through mb-1">{currentPrice.toLocaleString('vi-VN')} ₫</span>
           </>
         ) : (
           <span className="text-4xl font-bold text-foreground">{currentPrice.toLocaleString('vi-VN')} ₫</span>

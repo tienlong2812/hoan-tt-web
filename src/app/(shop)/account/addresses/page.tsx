@@ -20,8 +20,7 @@ export default async function AddressesPage() {
     .from('addresses')
     .select('*')
     .eq('user_id', user.id)
-    .order('is_default', { ascending: false })
-    .order('created_at', { ascending: false });
+    .order('is_default', { ascending: false });
 
   return (
     <div className="space-y-6">
@@ -47,12 +46,12 @@ export default async function AddressesPage() {
                    Mặc định
                  </Badge>
                )}
-               <div className="font-semibold text-lg mb-1">{address.full_name}</div>
-               <div className="text-muted-foreground text-sm mb-3">{address.phone_number}</div>
-               <div className="text-sm">
-                 <p>{address.detail_address}</p>
-                 {address.province && <p>{address.district ? `${address.district}, ${address.province}` : address.province}</p>}
-               </div>
+                <div className="font-semibold text-lg mb-1">{address.receiver_name}</div>
+                <div className="text-muted-foreground text-sm mb-3">{address.receiver_phone}</div>
+                <div className="text-sm">
+                  <p>{address.detail_address}</p>
+                  <p>{address.ward ? `${address.ward}, ` : ''}{address.district}, {address.province}</p>
+                </div>
 
                <div className="mt-4 pt-4 border-t flex items-center justify-between">
                  {!address.is_default && (

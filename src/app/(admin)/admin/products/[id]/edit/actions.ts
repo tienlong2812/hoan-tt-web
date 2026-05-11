@@ -15,10 +15,8 @@ export async function updateProductAction(formData: FormData) {
   const productName = formData.get('product_name') as string;
   const slug = formData.get('slug') as string;
 
-  const price = parseInt(formData.get('price') as string);
-  const discountPriceRaw = formData.get('discount_price') as string;
-  const discount_price = discountPriceRaw ? parseInt(discountPriceRaw) : null;
-  const stock = parseInt(formData.get('stock') as string);
+  const base_price = parseInt(formData.get('base_price') as string);
+  const weight = formData.get('weight') ? parseFloat(formData.get('weight') as string) : null;
   
   const brand_id = formData.get('brand_id') ? parseInt(formData.get('brand_id') as string) : null;
   const category_id = formData.get('category_id') ? parseInt(formData.get('category_id') as string) : null;
@@ -26,11 +24,9 @@ export async function updateProductAction(formData: FormData) {
   const updatePayload: any = {
     product_name: productName,
     slug,
-    sku: formData.get('sku') as string || null,
     description: formData.get('description') as string || null,
-    price,
-    discount_price,
-    stock,
+    base_price,
+    weight,
     status: formData.get('status') as string,
     origin: formData.get('origin') as string || null,
     brand_id,
@@ -95,7 +91,9 @@ export async function updateProductAction(formData: FormData) {
             variant_name: v.variant_name,
             sku: v.sku || null,
             price: v.price,
-            stock: v.stock || 0
+            discount_price: v.discount_price || null,
+            stock: v.stock || 0,
+            weight: v.weight || null,
           };
           if (v.variant_id) payload.variant_id = v.variant_id;
           return payload;

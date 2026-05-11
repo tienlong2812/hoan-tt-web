@@ -164,11 +164,6 @@ export default async function ProductDetailPage({
               <Link key={recProd.product_id} href={`/products/${recProd.slug}`}>
                 <Card className="group overflow-hidden border border-border/60 hover:border-primary/40 focus-within:ring-2 focus-within:ring-primary transition-all duration-300 bg-white hover:shadow-xl rounded-xl h-full">
                   <div className="aspect-square relative overflow-hidden bg-[#f8f9fa] flex items-center justify-center p-4">
-                    {recProd.discount_price && (
-                      <div className="absolute top-3 left-3 z-10 bg-[#ff4e52] text-white text-[11px] font-extrabold px-2.5 py-1 rounded-sm tracking-wider shadow-sm uppercase">
-                        Giảm Giá
-                      </div>
-                    )}
                     {recProd.thumbnail_url ? (
                       <img 
                         src={recProd.thumbnail_url} 
@@ -194,14 +189,7 @@ export default async function ProductDetailPage({
                       {recProd.product_name}
                     </h3>
                     <div className="flex items-end gap-2 mt-2">
-                      {recProd.discount_price ? (
-                        <>
-                          <span className="font-bold text-lg md:text-xl text-[#d95115]">{recProd.discount_price.toLocaleString('vi-VN')} ₫</span>
-                          <span className="text-[13px] text-muted-foreground line-through font-medium mb-0.5">{recProd.price.toLocaleString('vi-VN')} ₫</span>
-                        </>
-                      ) : (
-                        <span className="font-bold text-lg md:text-xl text-[#d95115]">{recProd.price.toLocaleString('vi-VN')} ₫</span>
-                      )}
+                      <span className="font-bold text-lg md:text-xl text-[#d95115]">{recProd.base_price.toLocaleString('vi-VN')} ₫</span>
                     </div>
                   </CardContent>
                 </Card>

@@ -24,11 +24,6 @@ export async function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b">
-      {/* Top Banner */}
-      <div className="bg-accent px-4 py-2 text-center text-xs font-medium text-white sm:text-sm tracking-wide">
-        Sức khỏe toàn cầu, chăm sóc Việt Nam - Miễn phí giao hàng đơn từ 1.000.000đ
-      </div>
-
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Main Header Area */}
         <div className="flex h-20 items-center justify-between gap-4 md:gap-8">
@@ -55,7 +50,7 @@ export async function Header() {
               </SheetContent>
             </Sheet>
           </div>
-          
+
           <Link href="/" className="flex items-center shrink-0">
             <img src="https://bbwylbgjopclabrnkcdj.supabase.co/storage/v1/object/public/product-images/HoanTT-LogoHoanTT150.png" alt="Hoan TT" className="h-10 md:h-12 w-auto object-contain" />
             <span className="sr-only">Hoan TT</span>
@@ -88,7 +83,7 @@ export async function Header() {
                 <span className="text-sm font-bold text-primary">08129.111.88</span>
               </div>
             </div>
-            
+
             <Link href="/account/profile" className={buttonVariants({ variant: "ghost", size: "icon", className: "rounded-full h-10 w-10 hover:text-primary hover:bg-primary/10 transition-colors hidden sm:flex" })}>
               <User className="h-5 w-5" />
               <span className="sr-only">Tài khoản</span>
@@ -120,19 +115,19 @@ export async function Header() {
             <Link href="/about" className="uppercase tracking-wide hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary py-3">Giới Thiệu</Link>
           </nav>
         </div>
-        
+
         {/* Mobile Search Bar */}
         <div className="lg:hidden pb-4">
-            <form action="/products" className="relative w-full">
-              <Input
-                type="search"
-                name="q"
-                placeholder="Tìm kiếm sản phẩm..."
-                className="w-full rounded-full border border-primary/20 bg-muted/20 pl-10 pr-4 h-11 focus-visible:ring-1 focus-visible:ring-primary shadow-sm"
-              />
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <button type="submit" className="hidden">Submit</button>
-            </form>
+          <form action="/products" className="relative w-full">
+            <Input
+              type="search"
+              name="q"
+              placeholder="Tìm kiếm sản phẩm..."
+              className="w-full rounded-full border border-primary/20 bg-muted/20 pl-10 pr-4 h-11 focus-visible:ring-1 focus-visible:ring-primary shadow-sm"
+            />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <button type="submit" className="hidden">Submit</button>
+          </form>
         </div>
       </div>
     </header>

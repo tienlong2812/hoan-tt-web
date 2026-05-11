@@ -6,10 +6,8 @@ export async function GET() {
   const data = [
     {
       product_name: 'Sản phẩm mẫu 1',
-      sku: 'SP001',
-      price: 150000,
-      discount_price: 120000,
-      stock: 100,
+      base_price: 150000,
+      weight: 500,
       status: 'active',
       origin: 'Hàn Quốc',
       category_id: 1,
@@ -18,10 +16,8 @@ export async function GET() {
     },
     {
       product_name: 'Sản phẩm mẫu 2',
-      sku: 'SP002',
-      price: 200000,
-      discount_price: '',
-      stock: 50,
+      base_price: 200000,
+      weight: '',
       status: 'active',
       origin: 'Úc',
       category_id: '',

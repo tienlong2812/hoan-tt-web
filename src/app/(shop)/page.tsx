@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, ShieldCheck, Truck, Zap } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { PromoPopup } from '@/components/layout/promo-popup';
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -26,6 +27,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PromoPopup />
       {/* Premium Hero Banner Section */}
       <section className="relative w-full bg-gradient-to-r from-primary to-accent py-16 lg:py-24 overflow-hidden text-white">
         {/* Abstract Background pattern */}
@@ -49,7 +51,7 @@ export default async function HomePage() {
               <div className="flex flex-col gap-3 min-[400px]:flex-row pt-4">
                 <Link 
                   href="/products" 
-                  className={buttonVariants({ size: "lg", className: "px-8 bg-white hover:bg-white/90 text-primary font-bold text-base rounded-full shadow-lg" })}
+                  className={buttonVariants({ size: "lg", className: "px-8 !bg-white !text-[#d71921] hover:!bg-[#d71921] hover:!text-white font-bold text-base rounded-full shadow-lg transition-all" })}
                 >
                   Mua Sắm Ngay <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
@@ -162,11 +164,6 @@ export default async function HomePage() {
                 <Link key={product.product_id} href={`/products/${product.slug}`}>
                   <Card className="group overflow-hidden border border-border/60 hover:border-primary/40 focus-within:ring-2 focus-within:ring-primary transition-all duration-300 bg-white hover:shadow-xl rounded-xl">
                     <div className="aspect-square relative overflow-hidden bg-[#f8f9fa] flex items-center justify-center p-4">
-                      {product.discount_price && (
-                        <div className="absolute top-3 left-3 z-10 bg-[#ff4e52] text-white text-[11px] font-extrabold px-2.5 py-1 rounded-sm tracking-wider shadow-sm uppercase">
-                          Giảm Giá
-                        </div>
-                      )}
                       {product.thumbnail_url ? (
                         <img 
                           src={product.thumbnail_url} 
@@ -192,14 +189,7 @@ export default async function HomePage() {
                         {product.product_name}
                       </h3>
                       <div className="flex items-end gap-2 mt-2">
-                        {product.discount_price ? (
-                          <>
-                            <span className="font-bold text-lg md:text-xl text-[#d95115]">{product.discount_price.toLocaleString('vi-VN')} ₫</span>
-                            <span className="text-[13px] text-muted-foreground line-through font-medium mb-0.5">{product.price.toLocaleString('vi-VN')} ₫</span>
-                          </>
-                        ) : (
-                          <span className="font-bold text-lg md:text-xl text-[#d95115]">{product.price.toLocaleString('vi-VN')} ₫</span>
-                        )}
+                        <span className="font-bold text-lg md:text-xl text-[#d95115]">{product.base_price.toLocaleString('vi-VN')} ₫</span>
                       </div>
                     </CardContent>
                   </Card>
