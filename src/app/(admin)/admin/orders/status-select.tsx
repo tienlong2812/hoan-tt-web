@@ -1,6 +1,6 @@
 'use client';
 
-export function OrderStatusSelect({ orderId, currentStatus }: { orderId: number, currentStatus: string }) {
+export function OrderStatusSelect({ currentStatus }: { currentStatus: string }) {
   return (
     <select 
       name="status" 

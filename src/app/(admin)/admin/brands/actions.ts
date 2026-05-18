@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { withAdminToast } from '@/lib/admin-toast';
 
 export async function createBrandAction(formData: FormData) {
   const cookieStore = await cookies();
@@ -40,10 +41,10 @@ export async function createBrandAction(formData: FormData) {
 
   if (error) {
     console.error('Insert Brand Error:', error);
-    throw new Error('Failed to create brand');
+    redirect(withAdminToast('/admin/brands', 'Không thể tạo thương hiệu. Vui lòng thử lại.', 'error'));
   }
 
-  redirect('/admin/brands');
+  redirect(withAdminToast('/admin/brands', 'Đã tạo thương hiệu.'));
 }
 
 export async function updateBrandAction(formData: FormData) {
@@ -54,7 +55,7 @@ export async function updateBrandAction(formData: FormData) {
   const brand_name = formData.get('brand_name') as string;
   const description = formData.get('description') as string;
 
-  const updatePayload: any = {
+  const updatePayload: { brand_name: string; description: string | null; logo_url?: string } = {
     brand_name,
     description: description || null
   };
@@ -82,10 +83,10 @@ export async function updateBrandAction(formData: FormData) {
 
   if (error) {
     console.error('Update Brand Error:', error);
-    throw new Error('Failed to update brand');
+    redirect(withAdminToast('/admin/brands', 'Không thể cập nhật thương hiệu. Vui lòng thử lại.', 'error'));
   }
 
-  redirect('/admin/brands');
+  redirect(withAdminToast('/admin/brands', 'Đã cập nhật thương hiệu.'));
 }
 
 export async function deleteBrandAction(formData: FormData) {
@@ -96,8 +97,9 @@ export async function deleteBrandAction(formData: FormData) {
   const { error } = await supabase.from('brands').delete().eq('brand_id', brand_id);
   if (error) {
     console.error('Delete Brand Error:', error);
-    throw new Error('Failed to delete brand. Make sure no products are using this brand.');
+    redirect(withAdminToast('/admin/brands', 'Không thể xóa thương hiệu đang được sử dụng.', 'error'));
   }
 
   revalidatePath('/admin/brands');
+  redirect(withAdminToast('/admin/brands', 'Đã xóa thương hiệu.'));
 }

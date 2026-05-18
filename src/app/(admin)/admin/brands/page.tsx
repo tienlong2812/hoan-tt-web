@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { deleteBrandAction } from './actions';
+import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
 
 export default async function AdminBrandsPage() {
   const cookieStore = await cookies();
@@ -13,17 +14,19 @@ export default async function AdminBrandsPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Quản lý Thương Hiệu</h1>
+      <AdminPageHeader
+        title="Quản lý thương hiệu"
+        description="Quản lý thông tin thương hiệu và logo hiển thị trên shop."
+        actions={
         <Link href="/admin/brands/create">
           <Button>
             <Plus className="mr-2 h-4 w-4" /> Thêm Thương Hiệu
           </Button>
         </Link>
-      </div>
+        }
+      />
 
-      <div className="border rounded-xl bg-card overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+      <AdminTableShell>
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-muted-foreground border-b border-border">
               <tr>
@@ -64,8 +67,7 @@ export default async function AdminBrandsPage() {
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+      </AdminTableShell>
     </>
   );
 }

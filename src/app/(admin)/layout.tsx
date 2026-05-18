@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { AdminNavigation, AdminSidebar } from '@/components/layout/admin-sidebar';
+import { AdminToastListener } from '@/components/admin/admin-toast-listener';
 import { Menu, Package, Store } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -10,6 +12,9 @@ export default function AdminLayout({
 }) {
   return (
     <div className="grid min-h-screen w-full bg-muted/30 md:grid-cols-[256px_1fr]">
+      <Suspense fallback={null}>
+        <AdminToastListener />
+      </Suspense>
       <AdminSidebar />
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/80 lg:px-6">

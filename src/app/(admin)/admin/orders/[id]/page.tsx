@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
+import { CheckCircle2 } from 'lucide-react';
 import { updateOrderStatus } from '../actions';
+import { AdminPageHeader, AdminPanel } from '@/components/admin/admin-page';
 
 export default async function AdminOrderDetailsPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -47,22 +47,21 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-6">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/orders">
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <h1 className="text-2xl font-bold tracking-tight">Chi Tiết Đơn Hàng #{order.order_id}</h1>
-        <Badge variant={order.order_status === 'delivered' ? 'default' : order.order_status === 'cancelled' ? 'destructive' : 'secondary'} className="ml-auto">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
+      <AdminPageHeader
+        title={`Chi tiết đơn hàng #${order.order_id}`}
+        description="Theo dõi sản phẩm, khách hàng, thanh toán và trạng thái giao hàng."
+        backHref="/admin/orders"
+        actions={
+        <Badge variant={order.order_status === 'delivered' ? 'default' : order.order_status === 'cancelled' ? 'destructive' : 'secondary'}>
           {statusMap[order.order_status] || order.order_status}
         </Badge>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
-          <div className="bg-card border rounded-xl p-6">
+          <AdminPanel>
             <h2 className="text-lg font-semibold mb-4">Sản Phẩm Đã Đặt</h2>
             <div className="space-y-4">
               {items?.map((item) => (
@@ -109,14 +108,15 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                 <span>{order.total_amount.toLocaleString('vi-VN')} ₫</span>
               </div>
             </div>
-          </div>
+          </AdminPanel>
         </div>
 
         <div className="space-y-8">
-          <div className="bg-card border rounded-xl p-6">
+          <AdminPanel>
             <h2 className="text-lg font-semibold mb-4 border-b pb-2">Cập Nhật Trạng Thái</h2>
             <form action={updateOrderStatus} className="space-y-4">
               <input type="hidden" name="order_id" value={order.order_id} />
+              <input type="hidden" name="return_to" value={`/admin/orders/${order.order_id}`} />
               <div className="space-y-2">
                 <label className="text-sm font-medium">Trạng thái đơn hàng</label>
                 <select 
@@ -150,9 +150,9 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                 <CheckCircle2 className="h-4 w-4 mr-2" /> Lưu Trạng Thái
               </Button>
             </form>
-          </div>
+          </AdminPanel>
 
-          <div className="bg-card border rounded-xl p-6">
+          <AdminPanel>
             <h2 className="text-lg font-semibold mb-4 border-b pb-2">Thông Tin Khách Hàng</h2>
             <div className="space-y-3 text-sm">
               <div>
@@ -180,7 +180,7 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                 <Badge variant="outline" className="uppercase">{order.payment_method}</Badge>
               </div>
             </div>
-          </div>
+          </AdminPanel>
         </div>
       </div>
     </div>

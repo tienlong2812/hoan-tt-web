@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { withAdminToast } from '@/lib/admin-toast';
 
 export async function createCouponAction(formData: FormData) {
   const cookieStore = await cookies();
@@ -30,11 +31,11 @@ export async function createCouponAction(formData: FormData) {
 
   if (error) {
     console.error('Error creating coupon:', error);
-    throw new Error('Failed to create coupon');
+    redirect(withAdminToast('/admin/coupons', 'Không thể tạo mã giảm giá. Vui lòng thử lại.', 'error'));
   }
 
   revalidatePath('/admin/coupons');
-  redirect('/admin/coupons');
+  redirect(withAdminToast('/admin/coupons', 'Đã tạo mã giảm giá.'));
 }
 
 export async function toggleCouponStatus(couponId: number, currentStatus: string) {
@@ -48,8 +49,11 @@ export async function toggleCouponStatus(couponId: number, currentStatus: string
     .update({ status: newStatus })
     .eq('coupon_id', couponId);
 
-  if (error) throw new Error('Failed to update coupon status');
+  if (error) {
+    redirect(withAdminToast('/admin/coupons', 'Không thể cập nhật trạng thái mã giảm giá.', 'error'));
+  }
   revalidatePath('/admin/coupons');
+  redirect(withAdminToast('/admin/coupons', 'Đã cập nhật trạng thái mã giảm giá.'));
 }
 
 export async function deleteCouponAction(couponId: number) {
@@ -61,6 +65,9 @@ export async function deleteCouponAction(couponId: number) {
     .delete()
     .eq('coupon_id', couponId);
 
-  if (error) throw new Error('Failed to delete coupon');
+  if (error) {
+    redirect(withAdminToast('/admin/coupons', 'Không thể xóa mã giảm giá.', 'error'));
+  }
   revalidatePath('/admin/coupons');
+  redirect(withAdminToast('/admin/coupons', 'Đã xóa mã giảm giá.'));
 }

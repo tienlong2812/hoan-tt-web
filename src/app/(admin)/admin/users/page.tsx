@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { updateUserRoleAction, updateUserStatusAction } from './actions';
 import { Ban, Trash2, CheckCircle } from 'lucide-react';
 import { ExportUsersModal } from './export-modal';
+import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
 
 export default async function AdminUsersPage() {
   const cookieStore = await cookies();
@@ -17,16 +18,13 @@ export default async function AdminUsersPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Quản Lý Người Dùng</h1>
-          <p className="text-muted-foreground mt-1">Quản lý quyền hạn và thông tin khách hàng.</p>
-        </div>
-        <ExportUsersModal />
-      </div>
+      <AdminPageHeader
+        title="Quản lý người dùng"
+        description="Quản lý quyền hạn, trạng thái và thông tin khách hàng."
+        actions={<ExportUsersModal />}
+      />
 
-      <div className="border rounded-xl bg-card overflow-hidden">
-        <div className="overflow-x-auto">
+      <AdminTableShell>
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-muted-foreground border-b border-border">
               <tr>
@@ -97,8 +95,7 @@ export default async function AdminUsersPage() {
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+      </AdminTableShell>
     </>
   );
 }

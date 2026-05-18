@@ -5,9 +5,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { createProductAction } from './actions';
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
 import { VariantList } from '../variant-list';
+import { AdminPageHeader, AdminPanel } from '@/components/admin/admin-page';
 
 export default async function CreateProductPage() {
   const cookieStore = await cookies();
@@ -19,17 +18,10 @@ export default async function CreateProductPage() {
   ]);
 
   return (
-    <div className="max-w-3xl mx-auto py-6">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/products">
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <h1 className="text-2xl font-bold tracking-tight">Thêm Sản Phẩm Mới</h1>
-      </div>
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+      <AdminPageHeader title="Thêm sản phẩm mới" description="Tạo sản phẩm, biến thể và hình ảnh hiển thị trên shop." backHref="/admin/products" />
 
-      <div className="bg-card border rounded-xl p-6">
+      <AdminPanel>
         <form action={createProductAction} className="space-y-8">
           <div className="space-y-4">
             <div>
@@ -110,7 +102,7 @@ export default async function CreateProductPage() {
             <Button type="submit" size="lg">Thêm Sản Phẩm</Button>
           </div>
         </form>
-      </div>
+      </AdminPanel>
     </div>
   );
 }

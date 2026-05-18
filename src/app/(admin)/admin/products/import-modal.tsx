@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { importProductsAction } from './import-actions';
+import { toast } from 'sonner';
 
 export function ImportExcelModal() {
   const [open, setOpen] = useState(false);
@@ -23,9 +24,10 @@ export function ImportExcelModal() {
     setLoading(true);
     try {
       await importProductsAction(formData);
+      toast.success('Import sản phẩm thành công');
       setOpen(false);
-    } catch (error: any) {
-      alert(error.message || 'Lỗi khi import file.');
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Lỗi khi import file.');
     } finally {
       setLoading(false);
     }

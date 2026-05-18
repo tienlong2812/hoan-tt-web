@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ImportExcelModal } from './import-modal';
 import { ExportProductsModal } from './export-modal';
+import { AdminPageHeader, AdminPanel, AdminTableShell } from '@/components/admin/admin-page';
+import { deleteProductAction } from './actions';
 
 export default async function AdminProductsPage(props: { searchParams: Promise<{ q?: string; category?: string }> }) {
   const searchParams = await props.searchParams;
@@ -36,9 +38,11 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-        <h1 className="text-2xl font-bold tracking-tight">Quản lý Sản Phẩm</h1>
-        <div className="flex items-center gap-2 flex-wrap">
+      <AdminPageHeader
+        title="Quản lý sản phẩm"
+        description="Quản lý danh mục sản phẩm, giá bán, trạng thái và import/export dữ liệu."
+        actions={
+        <>
           <ExportProductsModal />
           <ImportExcelModal />
           <Link href="/admin/products/create">
@@ -46,11 +50,12 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
               <Plus className="mr-2 h-4 w-4" /> Thêm Sản Phẩm
             </Button>
           </Link>
-        </div>
-      </div>
+        </>
+        }
+      />
 
       {/* Filters & Search */}
-      <div className="bg-card border rounded-xl p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm">
+      <AdminPanel className="p-4 md:p-4">
         <form className="flex-1 flex items-center gap-4 w-full" method="GET">
           <div className="relative w-full max-w-sm">
             <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -80,10 +85,9 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
             </Link>
           )}
         </form>
-      </div>
+      </AdminPanel>
 
-      <div className="border rounded-xl bg-card overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+      <AdminTableShell>
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-muted-foreground border-b border-border">
               <tr>
@@ -134,16 +138,9 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
                            <Edit className="h-4 w-4" />
                          </Button>
                        </Link>
-                       <form className="inline-block" action={async () => {
-                         'use server';
-                         const cookieStore = await cookies();
-                         const supabase = createClient(cookieStore);
-                         await supabase.from('products').delete().eq('product_id', p.product_id);
-                         const { revalidatePath } = await import('next/cache');
-                         revalidatePath('/admin/products');
-                       }}>
-                         <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600">
-                           <Trash2 className="h-4 w-4" />
+                       <form className="inline-block" action={deleteProductAction.bind(null, p.product_id)}>
+                          <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600">
+                            <Trash2 className="h-4 w-4" />
                          </Button>
                        </form>
                     </td>
@@ -161,8 +158,7 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+      </AdminTableShell>
     </>
   );
 }

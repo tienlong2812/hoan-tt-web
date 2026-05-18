@@ -1,17 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings } from 'lucide-react';
+import { AdminPageHeader } from '@/components/admin/admin-page';
 
 export default function AdminSettingsPage() {
   return (
     <>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Cấu Hình Hệ Thống</h1>
-          <p className="text-muted-foreground mt-1">Quản lý các cài đặt chung của hệ thống.</p>
-        </div>
-      </div>
+      <AdminPageHeader title="Cấu hình hệ thống" description="Quản lý các cài đặt chung của hệ thống." />
 
-      <Card className="max-w-3xl">
+      <Card className="max-w-3xl border-0 shadow-sm ring-1 ring-border/70">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-lg">

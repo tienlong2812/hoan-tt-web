@@ -1,21 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
 import { createCouponAction } from '../actions';
+import { AdminPageHeader, AdminPanel } from '@/components/admin/admin-page';
 
 export default function CreateCouponPage() {
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/coupons">
-          <Button variant="outline" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
-        </Link>
-        <h1 className="text-2xl font-bold tracking-tight">Tạo Mã Giảm Giá Mới</h1>
-      </div>
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+      <AdminPageHeader title="Tạo mã giảm giá mới" description="Thiết lập điều kiện và thời hạn cho coupon." backHref="/admin/coupons" />
 
-      <div className="bg-card border rounded-xl p-6">
+      <AdminPanel>
         <form action={createCouponAction} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -62,7 +56,7 @@ export default function CreateCouponPage() {
             <Button type="submit" size="lg">Tạo Mã Giảm Giá</Button>
           </div>
         </form>
-      </div>
+      </AdminPanel>
     </div>
   );
 }

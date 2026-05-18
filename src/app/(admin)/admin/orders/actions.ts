@@ -3,19 +3,24 @@
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { withAdminToast } from '@/lib/admin-toast';
 
 export async function updateOrderStatus(formData: FormData) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) redirect(withAdminToast('/admin/orders', 'Bạn cần đăng nhập để thực hiện thao tác này.', 'error'));
 
   const order_id = parseInt(formData.get('order_id') as string);
   const status = formData.get('status') as string;
   const payment_status = formData.get('payment_status') as string;
+  const returnTo = (formData.get('return_to') as string) || '/admin/orders';
 
-  if (!order_id || !status) return;
+  if (!order_id || !status) {
+    redirect(withAdminToast(returnTo, 'Thiếu thông tin đơn hàng cần cập nhật.', 'error'));
+  }
 
   // Get current order info for additional logic
   const { data: order } = await supabase
@@ -34,7 +39,7 @@ export async function updateOrderStatus(formData: FormData) {
     finalPaymentStatus = 'success';
   }
 
-  const updateData: any = {
+  const updateData: { order_status: string; updated_at: string; payment_status?: string } = {
     order_status: status,
     updated_at: new Date().toISOString()
   };
@@ -50,7 +55,7 @@ export async function updateOrderStatus(formData: FormData) {
 
   if (error) {
     console.error('Error updating order status:', error);
-    throw new Error('Failed to update order status');
+    redirect(withAdminToast(returnTo, 'Không thể cập nhật trạng thái đơn hàng.', 'error'));
   }
 
   // Sync to payments table
@@ -81,6 +86,8 @@ export async function updateOrderStatus(formData: FormData) {
   }
 
   revalidatePath('/admin/orders');
+  revalidatePath(`/admin/orders/${order_id}`);
+  redirect(withAdminToast(returnTo, 'Đã cập nhật trạng thái đơn hàng.'));
 }
 
 export async function getOrdersForExport(filters: { from?: string; to?: string; q?: string }) {

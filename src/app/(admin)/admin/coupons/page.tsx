@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Plus, Tag, Trash2, ToggleLeft } from 'lucide-react';
 import { toggleCouponStatus, deleteCouponAction } from './actions';
+import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
 
 export default async function CouponsPage() {
   const cookieStore = await cookies();
@@ -16,20 +17,20 @@ export default async function CouponsPage() {
     .order('coupon_id', { ascending: false });
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Mã Giảm Giá</h1>
-          <p className="text-muted-foreground mt-1">Quản lý các Coupon khuyến mãi cho khách hàng.</p>
-        </div>
+    <>
+      <AdminPageHeader
+        title="Mã giảm giá"
+        description="Quản lý các coupon khuyến mãi cho khách hàng."
+        actions={
         <Link href="/admin/coupons/create">
-          <Button className="rounded-full">
+          <Button>
             <Plus className="h-4 w-4 mr-2" /> Tạo mã mới
           </Button>
         </Link>
-      </div>
+        }
+      />
 
-      <div className="border rounded-xl overflow-hidden">
+      <AdminTableShell>
         <table className="w-full text-sm">
           <thead className="bg-muted/40 border-b">
             <tr>
@@ -92,7 +93,7 @@ export default async function CouponsPage() {
             ))}
           </tbody>
         </table>
-      </div>
-    </div>
+      </AdminTableShell>
+    </>
   );
 }

@@ -3,13 +3,37 @@
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { withAdminToast } from '@/lib/admin-toast';
+
+type ProductUpdatePayload = {
+  product_name: string;
+  slug: string;
+  description: string | null;
+  base_price: number;
+  weight: number | null;
+  status: string;
+  origin: string | null;
+  brand_id: number | null;
+  category_id: number | null;
+  thumbnail_url?: string;
+};
+
+type ProductVariantInput = {
+  variant_id?: number;
+  variant_name: string;
+  sku?: string;
+  price: number;
+  discount_price?: number | null;
+  stock?: number;
+  weight?: number | null;
+};
 
 export async function updateProductAction(formData: FormData) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) redirect(withAdminToast('/admin/products', 'Bạn cần đăng nhập để thực hiện thao tác này.', 'error'));
 
   const product_id = parseInt(formData.get('product_id') as string);
   const productName = formData.get('product_name') as string;
@@ -21,7 +45,7 @@ export async function updateProductAction(formData: FormData) {
   const brand_id = formData.get('brand_id') ? parseInt(formData.get('brand_id') as string) : null;
   const category_id = formData.get('category_id') ? parseInt(formData.get('category_id') as string) : null;
 
-  const updatePayload: any = {
+  const updatePayload: ProductUpdatePayload = {
     product_name: productName,
     slug,
     description: formData.get('description') as string || null,
@@ -65,19 +89,19 @@ export async function updateProductAction(formData: FormData) {
   const { error } = await supabase.from('products').update(updatePayload).eq('product_id', product_id);
   if (error) {
     console.error('Update Error:', error);
-    throw new Error('Failed to update product');
+    redirect(withAdminToast('/admin/products', 'Không thể cập nhật sản phẩm. Vui lòng thử lại.', 'error'));
   }
 
   // Handle Variants
   const variantsJson = formData.get('variants_json') as string;
   if (variantsJson) {
     try {
-      const variants = JSON.parse(variantsJson);
+      const variants = JSON.parse(variantsJson) as ProductVariantInput[];
       
       // Get existing variants to find which ones to delete
       const { data: existingVariants } = await supabase.from('product_variants').select('variant_id').eq('product_id', product_id);
       const existingIds = existingVariants?.map(v => v.variant_id) || [];
-      const incomingIds = variants.map((v: any) => v.variant_id).filter(Boolean);
+      const incomingIds = variants.map((v) => v.variant_id).filter(Boolean);
       
       const idsToDelete = existingIds.filter(id => !incomingIds.includes(id));
       if (idsToDelete.length > 0) {
@@ -85,8 +109,8 @@ export async function updateProductAction(formData: FormData) {
       }
 
       if (variants.length > 0) {
-        const variantUpserts = variants.map((v: any) => {
-          const payload: any = {
+        const variantUpserts = variants.map((v) => {
+          const payload: ProductVariantInput & { product_id: number } = {
             product_id: product_id,
             variant_name: v.variant_name,
             sku: v.sku || null,
@@ -114,7 +138,7 @@ export async function updateProductAction(formData: FormData) {
     
     // Get current max sort_order
     const { data: existingGallery } = await supabase.from('product_gallery').select('sort_order').eq('product_id', product_id).order('sort_order', { ascending: false }).limit(1);
-    let startOrder = existingGallery && existingGallery.length > 0 ? existingGallery[0].sort_order + 1 : 0;
+    const startOrder = existingGallery && existingGallery.length > 0 ? existingGallery[0].sort_order + 1 : 0;
 
     for (let i = 0; i < galleryFiles.length; i++) {
       const file = galleryFiles[i];
@@ -158,5 +182,5 @@ export async function updateProductAction(formData: FormData) {
     }
   }
 
-  redirect('/admin/products');
+  redirect(withAdminToast('/admin/products', 'Đã cập nhật sản phẩm.'));
 }

@@ -3,6 +3,8 @@
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { withAdminToast } from '@/lib/admin-toast';
 
 export async function updateUserRoleAction(userId: string, newRole: string) {
   const cookieStore = await cookies();
@@ -10,7 +12,7 @@ export async function updateUserRoleAction(userId: string, newRole: string) {
 
   // Authorization check (optional if RLS already handles it, but good practice)
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) redirect(withAdminToast('/admin/users', 'Bạn cần đăng nhập để thực hiện thao tác này.', 'error'));
 
   const { error } = await supabase
     .from('users')
@@ -19,10 +21,11 @@ export async function updateUserRoleAction(userId: string, newRole: string) {
 
   if (error) {
     console.error('Error updating user role:', error);
-    throw new Error('Failed to update user role');
+    redirect(withAdminToast('/admin/users', 'Không thể cập nhật quyền người dùng.', 'error'));
   }
 
   revalidatePath('/admin/users');
+  redirect(withAdminToast('/admin/users', 'Đã cập nhật quyền người dùng.'));
 }
 
 export async function updateUserStatusAction(userId: string, newStatus: string) {
@@ -30,7 +33,7 @@ export async function updateUserStatusAction(userId: string, newStatus: string) 
   const supabase = createClient(cookieStore);
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) redirect(withAdminToast('/admin/users', 'Bạn cần đăng nhập để thực hiện thao tác này.', 'error'));
 
   const { error } = await supabase
     .from('users')
@@ -39,10 +42,11 @@ export async function updateUserStatusAction(userId: string, newStatus: string) 
 
   if (error) {
     console.error('Error updating user status:', error);
-    throw new Error('Failed to update user status');
+    redirect(withAdminToast('/admin/users', 'Không thể cập nhật trạng thái người dùng.', 'error'));
   }
 
   revalidatePath('/admin/users');
+  redirect(withAdminToast('/admin/users', 'Đã cập nhật trạng thái người dùng.'));
 }
 
 export async function getUsersForExport() {

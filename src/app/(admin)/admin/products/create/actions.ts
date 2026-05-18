@@ -3,6 +3,16 @@
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { withAdminToast } from '@/lib/admin-toast';
+
+type ProductVariantInput = {
+  variant_name: string;
+  sku?: string;
+  price: number;
+  discount_price?: number | null;
+  stock?: number;
+  weight?: number | null;
+};
 
 function generateSlug(text: string) {
   return text.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') + '-' + Math.floor(Math.random() * 1000);
@@ -13,7 +23,7 @@ export async function createProductAction(formData: FormData) {
   const supabase = createClient(cookieStore);
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) redirect(withAdminToast('/admin/products', 'Bạn cần đăng nhập để thực hiện thao tác này.', 'error'));
 
   const productName = formData.get('product_name') as string;
   let slug = formData.get('slug') as string;
@@ -71,16 +81,16 @@ export async function createProductAction(formData: FormData) {
   
   if (error || !insertedProduct) {
     console.error('Insert Error:', error);
-    throw new Error('Failed to create product');
+    redirect(withAdminToast('/admin/products', 'Không thể tạo sản phẩm. Vui lòng thử lại.', 'error'));
   }
 
   // Handle Variants
   const variantsJson = formData.get('variants_json') as string;
   if (variantsJson) {
     try {
-      const variants = JSON.parse(variantsJson);
+      const variants = JSON.parse(variantsJson) as ProductVariantInput[];
       if (variants && variants.length > 0) {
-        const variantInserts = variants.map((v: any) => ({
+        const variantInserts = variants.map((v) => ({
           product_id: insertedProduct.product_id,
           variant_name: v.variant_name,
           sku: v.sku || null,
@@ -137,5 +147,5 @@ export async function createProductAction(formData: FormData) {
     }
   }
 
-  redirect('/admin/products');
+  redirect(withAdminToast('/admin/products', 'Đã tạo sản phẩm.'));
 }

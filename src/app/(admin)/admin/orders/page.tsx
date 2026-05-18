@@ -10,6 +10,7 @@ import { ExportOrdersModal } from './export-modal';
 
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { AdminPageHeader, AdminPanel, AdminTableShell } from '@/components/admin/admin-page';
 
 export default async function AdminOrdersPage({
   searchParams,
@@ -49,15 +50,14 @@ export default async function AdminOrdersPage({
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Quản Lý Đơn Hàng</h1>
-          <p className="text-muted-foreground mt-1">Tìm thấy {orders?.length || 0} đơn hàng | Tổng: {filteredRevenue.toLocaleString('vi-VN')} ₫</p>
-        </div>
-        
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <ExportOrdersModal />
-          <form className="flex flex-wrap items-center gap-3 flex-1 md:flex-initial">
+      <AdminPageHeader
+        title="Quản lý đơn hàng"
+        description={`Tìm thấy ${orders?.length || 0} đơn hàng. Tổng giá trị: ${filteredRevenue.toLocaleString('vi-VN')} ₫.`}
+        actions={<ExportOrdersModal />}
+      />
+
+      <AdminPanel className="p-4 md:p-4">
+          <form className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input 
@@ -80,11 +80,9 @@ export default async function AdminOrdersPage({
             </Link>
           )}
         </form>
-      </div>
-      </div>
+      </AdminPanel>
 
-      <div className="border rounded-xl bg-card overflow-hidden">
-        <div className="overflow-x-auto">
+      <AdminTableShell>
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-muted-foreground border-b border-border">
               <tr>
@@ -117,7 +115,8 @@ export default async function AdminOrdersPage({
                     <td className="p-4 text-center">
                       <form action={updateOrderStatus}>
                         <input type="hidden" name="order_id" value={order.order_id} />
-                        <OrderStatusSelect orderId={order.order_id} currentStatus={order.order_status} />
+                        <input type="hidden" name="return_to" value="/admin/orders" />
+                        <OrderStatusSelect currentStatus={order.order_status} />
                       </form>
                     </td>
                     <td className="p-4 text-right">
@@ -138,8 +137,7 @@ export default async function AdminOrdersPage({
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+      </AdminTableShell>
     </>
   );
 }
