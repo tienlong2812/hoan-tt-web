@@ -21,7 +21,7 @@ type ProductUpdatePayload = {
 type ProductVariantInput = {
   variant_id?: number;
   variant_name: string;
-  sku?: string;
+  sku?: string | null;
   price: number;
   discount_price?: number | null;
   stock?: number;

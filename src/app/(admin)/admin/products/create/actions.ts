@@ -7,7 +7,7 @@ import { withAdminToast } from '@/lib/admin-toast';
 
 type ProductVariantInput = {
   variant_name: string;
-  sku?: string;
+  sku?: string | null;
   price: number;
   discount_price?: number | null;
   stock?: number;

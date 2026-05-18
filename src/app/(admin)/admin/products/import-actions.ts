@@ -5,9 +5,28 @@ import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import * as XLSX from 'xlsx';
 
+type ProductImportRow = Record<string, string | number | null | undefined>;
+
+type ProductImportPayload = {
+  product_name: string;
+  slug: string;
+  base_price: number;
+  weight: number | null;
+  status: string;
+  origin: string | null;
+  description: string | null;
+  category_id: number | null;
+  brand_id: number | null;
+};
+
 function generateSlug(text: string) {
   if (!text) return '';
   return text.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') + '-' + Math.floor(Math.random() * 1000);
+}
+
+function numberFromCell(value: string | number | null | undefined) {
+  const parsed = typeof value === 'number' ? value : parseFloat(String(value || ''));
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 export async function importProductsAction(formData: FormData) {
@@ -31,29 +50,30 @@ export async function importProductsAction(formData: FormData) {
   const workbook = XLSX.read(buffer, { type: 'buffer' });
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
-  const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+  const jsonData = XLSX.utils.sheet_to_json<ProductImportRow>(worksheet);
 
   if (!jsonData || jsonData.length === 0) {
     throw new Error("File Excel không có dữ liệu.");
   }
 
   // Map to Supabase Schema
-  const insertPayloads = jsonData.map(row => {
+  const insertPayloads = jsonData.map((row): ProductImportPayload | null => {
     const productName = row['product_name'] || row['Tên sản phẩm'];
     if (!productName) return null; // Skip rows without name
+    const productNameText = String(productName);
 
     return {
-      product_name: productName,
-      slug: generateSlug(productName),
-      base_price: parseInt(row['base_price'] || row['price'] || row['Giá']) || 0,
-      weight: parseFloat(row['weight'] || row['Khối lượng']) || null,
-      status: row['status'] || row['Trạng thái'] || 'active',
-      origin: row['origin'] || row['Xuất xứ'] || null,
-      description: row['description'] || row['Mô tả'] || null,
-      category_id: parseInt(row['category_id'] || row['Danh mục ID']) || null,
-      brand_id: parseInt(row['brand_id'] || row['Thương hiệu ID']) || null,
+      product_name: productNameText,
+      slug: generateSlug(productNameText),
+      base_price: numberFromCell(row['base_price'] || row['price'] || row['Giá']),
+      weight: numberFromCell(row['weight'] || row['Khối lượng']) || null,
+      status: String(row['status'] || row['Trạng thái'] || 'active'),
+      origin: row['origin'] || row['Xuất xứ'] ? String(row['origin'] || row['Xuất xứ']) : null,
+      description: row['description'] || row['Mô tả'] ? String(row['description'] || row['Mô tả']) : null,
+      category_id: numberFromCell(row['category_id'] || row['Danh mục ID']) || null,
+      brand_id: numberFromCell(row['brand_id'] || row['Thương hiệu ID']) || null,
     };
-  }).filter(Boolean); // remove nulls
+  }).filter((row): row is ProductImportPayload => row !== null);
 
   if (insertPayloads.length === 0) {
     throw new Error("Không tìm thấy dữ liệu hợp lệ trong file Excel.");
