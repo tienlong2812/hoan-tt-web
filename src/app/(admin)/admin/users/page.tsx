@@ -5,6 +5,7 @@ import { updateUserRoleAction, updateUserStatusAction } from './actions';
 import { Ban, Trash2, CheckCircle } from 'lucide-react';
 import { ExportUsersModal } from './export-modal';
 import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
+import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
 
 export default async function AdminUsersPage() {
   const cookieStore = await cookies();
@@ -77,9 +78,15 @@ export default async function AdminUsersPage() {
                             </button>
                           </form>
                           <form action={updateUserStatusAction.bind(null, u.user_id, 'deleted')}>
-                            <button type="submit" title="Xóa tài khoản" className="p-1.5 rounded-md hover:bg-muted text-destructive">
+                            <ConfirmSubmitButton
+                              message={`Bạn có chắc muốn xóa tài khoản "${u.email}"?`}
+                              title="Xóa tài khoản"
+                              variant="ghost"
+                              size="icon-sm"
+                              className="text-destructive hover:bg-muted"
+                            >
                               <Trash2 className="h-4 w-4" />
-                            </button>
+                            </ConfirmSubmitButton>
                           </form>
                         </div>
                       </div>

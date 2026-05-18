@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Plus, Tag, Trash2, ToggleLeft } from 'lucide-react';
 import { toggleCouponStatus, deleteCouponAction } from './actions';
 import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
+import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
 
 export default async function CouponsPage() {
   const cookieStore = await cookies();
@@ -83,9 +84,15 @@ export default async function CouponsPage() {
                       </button>
                     </form>
                     <form action={deleteCouponAction.bind(null, c.coupon_id)}>
-                      <button type="submit" title="Xóa" className="text-muted-foreground hover:text-destructive p-1 transition-colors">
+                      <ConfirmSubmitButton
+                        message={`Bạn có chắc muốn xóa mã giảm giá "${c.code}"?`}
+                        title="Xóa"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="text-muted-foreground hover:text-destructive"
+                      >
                         <Trash2 className="h-4 w-4" />
-                      </button>
+                      </ConfirmSubmitButton>
                     </form>
                   </div>
                 </td>

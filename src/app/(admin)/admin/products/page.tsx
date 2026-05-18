@@ -9,6 +9,7 @@ import { ImportExcelModal } from './import-modal';
 import { ExportProductsModal } from './export-modal';
 import { AdminPageHeader, AdminPanel, AdminTableShell } from '@/components/admin/admin-page';
 import { deleteProductAction } from './actions';
+import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
 
 export default async function AdminProductsPage(props: { searchParams: Promise<{ q?: string; category?: string }> }) {
   const searchParams = await props.searchParams;
@@ -139,10 +140,15 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
                          </Button>
                        </Link>
                        <form className="inline-block" action={deleteProductAction.bind(null, p.product_id)}>
-                          <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600">
-                            <Trash2 className="h-4 w-4" />
-                         </Button>
-                       </form>
+                          <ConfirmSubmitButton
+                            message={`Bạn có chắc muốn xóa sản phẩm "${p.product_name}"?`}
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
+                          >
+                             <Trash2 className="h-4 w-4" />
+                          </ConfirmSubmitButton>
+                        </form>
                     </td>
                   </tr>
                 ))

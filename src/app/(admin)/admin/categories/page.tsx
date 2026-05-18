@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { deleteCategoryAction } from './actions';
 import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
+import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
 
 export default async function AdminCategoriesPage() {
   const cookieStore = await cookies();
@@ -51,10 +52,15 @@ export default async function AdminCategoriesPage() {
                        </Link>
                        <form className="inline-block" action={deleteCategoryAction}>
                          <input type="hidden" name="category_id" value={c.category_id} />
-                         <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600">
-                           <Trash2 className="h-4 w-4" />
-                         </Button>
-                       </form>
+                          <ConfirmSubmitButton
+                            message={`Bạn có chắc muốn xóa danh mục "${c.category_name}"?`}
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </ConfirmSubmitButton>
+                        </form>
                     </td>
                   </tr>
                 ))
