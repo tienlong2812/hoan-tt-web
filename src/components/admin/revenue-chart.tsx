@@ -3,29 +3,34 @@
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 
 export function RevenueChart({ data }: { data: any[] }) {
-  // Aggregate data by date
-  // Expect data to have order_date and total_amount
   const aggregatedData = data.reduce((acc: any, curr) => {
-    const dateStr = curr.order_date || curr.created_at; // Fallback just in case
+    const dateStr = curr.order_date || curr.created_at;
     if (!dateStr) return acc;
-    const date = new Date(dateStr).toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' });
-    if (!acc[date]) {
-      acc[date] = { date, revenue: 0 };
+    const orderDate = new Date(dateStr);
+    const key = orderDate.toISOString().slice(0, 10);
+
+    if (!acc[key]) {
+      acc[key] = {
+        key,
+        date: orderDate.toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' }),
+        revenue: 0,
+      };
     }
-    acc[date].revenue += Number(curr.total_amount);
+    acc[key].revenue += Number(curr.total_amount);
     return acc;
   }, {});
 
-  // Convert to array and take last 7 items or sort properly
-  const chartData = Object.values(aggregatedData).slice(-10); // Display last 10 dates
+  const chartData = Object.values(aggregatedData)
+    .sort((a: any, b: any) => a.key.localeCompare(b.key))
+    .slice(-10);
 
   if (chartData.length === 0) {
-    return <div className="flex h-[350px] items-center justify-center text-muted-foreground">Không có dữ liệu doanh thu gần đây.</div>;
+    return <div className="flex h-[320px] items-center justify-center text-muted-foreground">Không có dữ liệu doanh thu gần đây.</div>;
   }
 
   return (
-    <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={chartData}>
+    <ResponsiveContainer width="100%" height={320}>
+      <BarChart data={chartData} margin={{ top: 12, right: 4, left: -18, bottom: 0 }}>
         <XAxis
           dataKey="date"
           stroke="#888888"
@@ -42,9 +47,11 @@ export function RevenueChart({ data }: { data: any[] }) {
         />
         <Tooltip 
           formatter={(value: any) => [`${Number(value).toLocaleString('vi-VN')} ₫`, 'Doanh Thu']}
-          labelStyle={{ color: 'black' }}
+          cursor={{ fill: 'rgba(215, 25, 33, 0.08)' }}
+          contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb' }}
+          labelStyle={{ color: 'black', fontWeight: 700 }}
         />
-        <Bar dataKey="revenue" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
+        <Bar dataKey="revenue" fill="currentColor" radius={[8, 8, 0, 0]} className="fill-primary" />
       </BarChart>
     </ResponsiveContainer>
   );
