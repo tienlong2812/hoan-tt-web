@@ -30,6 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
       discount_price: null,
       quantity: 1,
       thumbnail_url: product.thumbnail_url || '',
+      slug: product.slug,
     });
     toast.success(`${product.product_name} added to cart`);
   };

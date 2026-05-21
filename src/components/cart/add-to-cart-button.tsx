@@ -16,6 +16,9 @@ export function AddToCartButton({
     discount_price?: number | null;
     thumbnail_url?: string | null;
     stock: number;
+    variant_id?: number;
+    variant_name?: string;
+    slug?: string;
   };
   quantity: number;
 }) {
@@ -30,7 +33,10 @@ export function AddToCartButton({
       price: product.price,
       discount_price: product.discount_price || null,
       thumbnail_url: product.thumbnail_url || '',
-      quantity: quantity
+      quantity: quantity,
+      variant_id: product.variant_id,
+      variant_name: product.variant_name,
+      slug: product.slug,
     });
 
     toast.success("Đã thêm vào giỏ hàng", {

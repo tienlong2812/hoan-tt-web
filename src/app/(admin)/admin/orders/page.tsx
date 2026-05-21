@@ -7,6 +7,7 @@ import { updateOrderStatus } from './actions';
 import { Eye } from 'lucide-react';
 import { OrderStatusSelect } from './status-select';
 import { ExportOrdersModal } from './export-modal';
+import { OrdersTableClient } from './orders-table-client';
 
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
@@ -83,60 +84,7 @@ export default async function AdminOrdersPage({
       </AdminPanel>
 
       <AdminTableShell>
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-muted-foreground border-b border-border">
-              <tr>
-                <th className="font-medium text-left p-4">ID Đơn Hàng</th>
-                <th className="font-medium text-left p-4">Khách Hàng</th>
-                <th className="font-medium text-left p-4">Ngày Đặt</th>
-                <th className="font-medium text-right p-4">Tổng Tiền</th>
-                <th className="font-medium text-center p-4">Thanh Toán</th>
-                <th className="font-medium text-center p-4">Trạng Thái</th>
-                <th className="font-medium text-right p-4">Hành Động</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {orders && orders.length > 0 ? (
-                orders.map((order) => (
-                  <tr key={order.order_id} className="hover:bg-muted/30 transition-colors">
-                    <td className="p-4 font-medium">#{order.order_id}</td>
-                    <td className="p-4">
-                      <div className="font-medium">{(order.users as any)?.full_name || 'Khách'}</div>
-                    </td>
-                    <td className="p-4 text-muted-foreground">
-                      {new Date(order.created_at).toLocaleDateString('vi-VN')}
-                    </td>
-                    <td className="p-4 text-right font-medium">
-                      {order.total_amount.toLocaleString('vi-VN')} ₫
-                    </td>
-                    <td className="p-4 text-center">
-                      <Badge variant="outline">{order.payment_status}</Badge>
-                    </td>
-                    <td className="p-4 text-center">
-                      <form action={updateOrderStatus}>
-                        <input type="hidden" name="order_id" value={order.order_id} />
-                        <input type="hidden" name="return_to" value="/admin/orders" />
-                        <OrderStatusSelect currentStatus={order.order_status} />
-                      </form>
-                    </td>
-                    <td className="p-4 text-right">
-                       <Link href={`/admin/orders/${order.order_id}`}>
-                         <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" title="Xem chi tiết">
-                           <Eye className="h-4 w-4" />
-                         </Button>
-                       </Link>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
-                    Chưa có đơn hàng nào.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <OrdersTableClient orders={orders || []} />
       </AdminTableShell>
     </>
   );

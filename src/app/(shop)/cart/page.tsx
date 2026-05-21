@@ -46,12 +46,22 @@ export default function CartPage() {
                 </div>
                 <div className="flex flex-col flex-1">
                   <div className="flex justify-between items-start gap-2">
-                    <Link href={`/products/`} className="font-medium text-base sm:text-lg hover:text-primary transition-colors line-clamp-2">
-                      {item.name}
-                    </Link>
+                    <div className="flex flex-col gap-1 min-w-0 flex-1">
+                      <Link 
+                        href={item.slug ? `/products/${item.slug}` : '/products'} 
+                        className="font-medium text-base sm:text-lg hover:text-primary transition-colors line-clamp-2"
+                      >
+                        {item.name}
+                      </Link>
+                      {item.variant_name && (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/5 px-2.5 py-1 rounded-md w-fit">
+                          Phân loại: {item.variant_name}
+                        </span>
+                      )}
+                    </div>
                     <button 
                       onClick={() => removeItem(item.product_id, item.variant_id)}
-                      className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                      className="text-muted-foreground hover:text-destructive transition-colors p-1 shrink-0"
                     >
                       <Trash2 className="h-5 w-5" />
                     </button>

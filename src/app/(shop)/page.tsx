@@ -40,8 +40,8 @@ export default async function HomePage() {
                 <Badge className="bg-white/20 text-white hover:bg-white/30 px-4 py-1.5 text-sm rounded-full w-fit mb-2 backdrop-blur-sm border-none font-semibold shadow-sm">
                   Top Khuyên Dùng Tại Việt Nam
                 </Badge>
-                <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none uppercase text-white drop-shadow-md">
-                  Sức khỏe toàn cầu,<br /> chăm sóc Việt Nam
+                <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl xl:text-5xl uppercase text-white drop-shadow-md text-balance leading-tight">
+                  Sức khỏe toàn cầu, chăm sóc Việt Nam
                 </h1>
                 <p className="max-w-[600px] text-white/90 md:text-lg lg:text-xl font-medium leading-relaxed drop-shadow-sm text-justify">
                   Hoan TT không chỉ đơn thuần là nhà nhập khẩu, mà là những người đưa đến những giải pháp sức khỏe và sắc đẹp xuất sắc từ khắp thế giới.<br/><br/>

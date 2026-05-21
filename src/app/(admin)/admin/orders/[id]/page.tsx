@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { CheckCircle2 } from 'lucide-react';
 import { updateOrderStatus } from '../actions';
 import { AdminPageHeader, AdminPanel } from '@/components/admin/admin-page';
+import { GhnPushButton } from './ghn-push-button';
 
 export default async function AdminOrderDetailsPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -53,9 +54,9 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
         description="Theo dõi sản phẩm, khách hàng, thanh toán và trạng thái giao hàng."
         backHref="/admin/orders"
         actions={
-        <Badge variant={order.order_status === 'delivered' ? 'default' : order.order_status === 'cancelled' ? 'destructive' : 'secondary'}>
-          {statusMap[order.order_status] || order.order_status}
-        </Badge>
+          <Badge variant={order.order_status === 'delivered' ? 'default' : order.order_status === 'cancelled' ? 'destructive' : 'secondary'}>
+            {statusMap[order.order_status] || order.order_status}
+          </Badge>
         }
       />
 
@@ -86,7 +87,7 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
             </div>
 
             <Separator className="my-6" />
-            
+
             <div className="space-y-3 font-medium text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Tạm tính</span>
@@ -119,8 +120,8 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
               <input type="hidden" name="return_to" value={`/admin/orders/${order.order_id}`} />
               <div className="space-y-2">
                 <label className="text-sm font-medium">Trạng thái đơn hàng</label>
-                <select 
-                  name="status" 
+                <select
+                  name="status"
                   defaultValue={order.order_status}
                   disabled={order.order_status === 'delivered'}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -132,11 +133,11 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                   <option value="cancelled">Hủy đơn</option>
                 </select>
               </div>
-              
+
               <div className="space-y-2 pt-2">
                 <label className="text-sm font-medium">Trạng thái thanh toán</label>
-                <select 
-                  name="payment_status" 
+                <select
+                  name="payment_status"
                   defaultValue={order.payment_status}
                   disabled={order.order_status === 'delivered'}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -152,6 +153,48 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                 <CheckCircle2 className="h-4 w-4 mr-2" /> Lưu Trạng Thái
               </Button>
             </form>
+          </AdminPanel>
+
+          <AdminPanel>
+            <h2 className="text-lg font-semibold mb-4 border-b pb-2">Vận Chuyển (Giao Hàng Nhanh)</h2>
+            <div className="space-y-3 text-sm">
+              <div>
+                <span className="text-muted-foreground block text-xs">Mã vận đơn GHN</span>
+                {order.ghn_order_code ? (
+                  <a
+                    href={`https://donhang.ghn.vn/?order_code=${order.ghn_order_code}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-green-600 hover:underline"
+                  >
+                    {order.ghn_order_code}
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground">Chưa có</span>
+                )}
+              </div>
+              {order.shipping_status && (
+                <div>
+                  <span className="text-muted-foreground block text-xs">Trạng thái giao hàng</span>
+                  <Badge variant="outline">{order.shipping_status}</Badge>
+                </div>
+              )}
+              {order.expected_delivery_time && (
+                <div>
+                  <span className="text-muted-foreground block text-xs">Thời gian dự kiến</span>
+                  <span>{new Date(order.expected_delivery_time).toLocaleString('vi-VN')}</span>
+                </div>
+              )}
+              {order.shipping_error && (
+                <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-md border border-red-100 text-xs break-words">
+                  <span className="font-semibold block mb-1">Lỗi tạo đơn GHN:</span>
+                  {order.shipping_error}
+                </div>
+              )}
+              {!order.ghn_order_code && (
+                <GhnPushButton orderId={order.order_id} />
+              )}
+            </div>
           </AdminPanel>
 
           <AdminPanel>

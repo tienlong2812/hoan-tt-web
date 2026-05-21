@@ -5,6 +5,7 @@ export interface CartItem {
   product_id: number;
   variant_id?: number;
   variant_name?: string;
+  slug?: string;
   name: string;
   price: number;
   discount_price: number | null;

@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { requestCancelOrder } from './actions';
+import { OrderPaymentButton } from './order-payment-button';
 
 export default async function OrdersPage() {
   const cookieStore = await cookies();
@@ -17,7 +18,7 @@ export default async function OrdersPage() {
 
   const { data: orders } = await supabase
     .from('orders')
-    .select('*, order_items(*, products(product_name, thumbnail_url))')
+    .select('*, order_items(*, products(product_name, thumbnail_url), product_variants(variant_name))')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
@@ -36,7 +37,7 @@ export default async function OrdersPage() {
                   <div className="text-sm text-muted-foreground mb-1">Mã đơn hàng #{order.order_id}</div>
                   <div className="font-medium text-lg">{order.total_amount.toLocaleString('vi-VN')} ₫</div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Badge variant={order.order_status === 'delivered' ? 'default' : 'secondary'}>
                     {order.order_status === 'pending' ? 'Chờ xác nhận' :
                      order.order_status === 'processing' ? 'Đang lấy hàng' :
@@ -44,7 +45,19 @@ export default async function OrdersPage() {
                      order.order_status === 'delivered' ? 'Đã giao' :
                      order.order_status === 'cancelled' ? 'Đã hủy' : order.order_status.toUpperCase()}
                   </Badge>
-                  <Badge variant="outline">{order.payment_method}</Badge>
+                  
+                  {order.payment_method === 'BankTransfer' ? (
+                    <Badge variant={order.payment_status === 'paid' ? 'default' : 'secondary'} className={order.payment_status === 'paid' ? 'bg-emerald-500 hover:bg-emerald-600 text-white border-0' : 'bg-amber-500 hover:bg-amber-600 text-white border-0'}>
+                      {order.payment_status === 'paid' ? 'Đã thanh toán (VietQR)' : 'Chờ thanh toán (VietQR)'}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">{order.payment_method}</Badge>
+                  )}
+
+                  {order.payment_method === 'BankTransfer' && order.payment_status === 'pending' && order.order_status !== 'cancelled' && (
+                    <OrderPaymentButton orderId={order.order_id} amount={order.total_amount} />
+                  )}
+
                   {order.order_status === 'pending' && (
                     <form action={requestCancelOrder}>
                       <input type="hidden" name="order_id" value={order.order_id} />
@@ -59,6 +72,9 @@ export default async function OrdersPage() {
                     <img src={item.products?.thumbnail_url || ''} alt="" className="w-16 h-16 rounded object-cover bg-muted" />
                     <div>
                       <div className="font-medium">{item.products?.product_name || 'Unknown Product'}</div>
+                      {item.product_variants?.variant_name && (
+                        <div className="text-xs text-primary font-medium">{item.product_variants.variant_name}</div>
+                      )}
                       <div className="text-sm text-muted-foreground">SL: {item.quantity} x {item.price_at_purchase.toLocaleString('vi-VN')} ₫</div>
                     </div>
                   </div>
@@ -74,6 +90,20 @@ export default async function OrdersPage() {
                     <div className="mt-0.5">{order.detail_address}{order.ward ? `, ${order.ward}` : ''}, {order.district}, {order.province}</div>
                   )}
                 </div>
+                {order.ghn_order_code && (
+                  <div className="text-sm mt-1">
+                    <span className="text-muted-foreground mr-1">Tra cứu vận đơn GHN:</span>
+                    <a 
+                      href={`https://donhang.ghn.vn/?order_code=${order.ghn_order_code}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-green-600 hover:underline"
+                      title="Nhấn vào để theo dõi tiến trình giao hàng"
+                    >
+                      {order.ghn_order_code}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           ))}
