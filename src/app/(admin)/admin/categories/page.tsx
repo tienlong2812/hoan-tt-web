@@ -6,12 +6,31 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 import { deleteCategoryAction } from './actions';
 import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
 import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
+import { AdminPagination } from '@/components/admin/admin-pagination';
 
-export default async function AdminCategoriesPage() {
+export default async function AdminCategoriesPage(props: {
+  searchParams: Promise<{ page?: string; limit?: string }>;
+}) {
+  const searchParams = await props.searchParams;
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const limit = Number(searchParams.limit) || 20;
+  const fromIndex = (page - 1) * limit;
+  const toIndex = fromIndex + limit - 1;
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const { data: categories } = await supabase.from('categories').select('*').order('category_id', { ascending: false });
+  // Get total count of categories
+  const { count: totalItems } = await supabase
+    .from('categories')
+    .select('*', { count: 'exact', head: true });
+
+  // Get paginated categories
+  const { data: categories } = await supabase
+    .from('categories')
+    .select('*')
+    .order('category_id', { ascending: false })
+    .range(fromIndex, toIndex);
 
   return (
     <>
@@ -74,6 +93,11 @@ export default async function AdminCategoriesPage() {
             </tbody>
           </table>
       </AdminTableShell>
+      <AdminPagination
+        totalItems={totalItems || 0}
+        currentPage={page}
+        pageSize={limit}
+      />
     </>
   );
 }

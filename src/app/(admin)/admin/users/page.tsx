@@ -6,16 +6,33 @@ import { Ban, Trash2, CheckCircle } from 'lucide-react';
 import { ExportUsersModal } from './export-modal';
 import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
 import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
+import { AdminPagination } from '@/components/admin/admin-pagination';
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage(props: {
+  searchParams: Promise<{ page?: string; limit?: string }>;
+}) {
+  const searchParams = await props.searchParams;
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const limit = Number(searchParams.limit) || 20;
+  const fromIndex = (page - 1) * limit;
+  const toIndex = fromIndex + limit - 1;
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
+  // Get total count of active users
+  const { count: totalItems } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .neq('status', 'deleted');
+
+  // Get paginated users
   const { data: users } = await supabase
     .from('users')
     .select('*')
     .neq('status', 'deleted')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(fromIndex, toIndex);
 
   return (
     <>
@@ -103,6 +120,11 @@ export default async function AdminUsersPage() {
             </tbody>
           </table>
       </AdminTableShell>
+      <AdminPagination
+        totalItems={totalItems || 0}
+        currentPage={page}
+        pageSize={limit}
+      />
     </>
   );
 }

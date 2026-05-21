@@ -10,11 +10,18 @@ import { ExportProductsModal } from './export-modal';
 import { AdminPageHeader, AdminPanel, AdminTableShell } from '@/components/admin/admin-page';
 import { deleteProductAction } from './actions';
 import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
+import { AdminPagination } from '@/components/admin/admin-pagination';
 
-export default async function AdminProductsPage(props: { searchParams: Promise<{ q?: string; category?: string }> }) {
+export default async function AdminProductsPage(props: {
+  searchParams: Promise<{ q?: string; category?: string; page?: string; limit?: string }>;
+}) {
   const searchParams = await props.searchParams;
   const q = searchParams?.q || '';
   const categoryFilter = searchParams?.category || '';
+  const page = Math.max(1, Number(searchParams?.page) || 1);
+  const limit = Number(searchParams?.limit) || 20;
+  const fromIndex = (page - 1) * limit;
+  const toIndex = fromIndex + limit - 1;
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -22,19 +29,29 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
   // Fetch Categories for Filter Dropdown
   const { data: categories } = await supabase.from('categories').select('*');
 
-  // Build Query
+  // Build Count Query
+  let countQuery = supabase
+    .from('products')
+    .select('*', { count: 'exact', head: true });
+
+  // Build Main Query
   let query = supabase
     .from('products')
     .select('*, brands(brand_name), categories(category_name)')
     .order('created_at', { ascending: false });
 
   if (q) {
+    countQuery = countQuery.ilike('product_name', `%${q}%`);
     query = query.ilike('product_name', `%${q}%`);
   }
   if (categoryFilter) {
+    countQuery = countQuery.eq('category_id', categoryFilter);
     query = query.eq('category_id', categoryFilter);
   }
 
+  const { count: totalItems } = await countQuery;
+
+  query = query.range(fromIndex, toIndex);
   const { data: products } = await query;
 
   return (
@@ -165,6 +182,11 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
             </tbody>
           </table>
       </AdminTableShell>
+      <AdminPagination
+        totalItems={totalItems || 0}
+        currentPage={page}
+        pageSize={limit}
+      />
     </>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useCartStore } from '@/store/useCartStore';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,14 @@ type CouponResult = {
   message: string;
 };
 
+interface AddressNode {
+  code: string;
+  name: string;
+  name_with_type: string;
+  'quan-huyen'?: Record<string, AddressNode>;
+  'xa-phuong'?: Record<string, AddressNode>;
+}
+
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCartStore();
   const [mounted, setMounted] = useState(false);
@@ -28,6 +36,36 @@ export default function CheckoutPage() {
   const [selectedPayment, setSelectedPayment] = useState('COD');
   const [coupon, setCoupon] = useState<CouponResult | null>(null);
   const router = useRouter();
+
+  const [addressData, setAddressData] = useState<Record<string, AddressNode>>({});
+  const [selectedProvinceCode, setSelectedProvinceCode] = useState('');
+  const [selectedDistrictCode, setSelectedDistrictCode] = useState('');
+  const [selectedWardCode, setSelectedWardCode] = useState('');
+
+  useEffect(() => {
+    fetch('/data/vn-provinces.json')
+      .then(res => res.json())
+      .then(data => setAddressData(data))
+      .catch(err => console.error("Failed to load address data:", err));
+  }, []);
+
+  const provinces = useMemo(() => {
+    return Object.values(addressData).sort((a, b) => a.name.localeCompare(b.name));
+  }, [addressData]);
+
+  const districts = useMemo(() => {
+    if (!selectedProvinceCode || !addressData[selectedProvinceCode]) return [];
+    const quanHuyen = addressData[selectedProvinceCode]['quan-huyen'];
+    if (!quanHuyen) return [];
+    return Object.values(quanHuyen).sort((a, b) => a.name.localeCompare(b.name));
+  }, [selectedProvinceCode, addressData]);
+
+  const wards = useMemo(() => {
+    if (!selectedProvinceCode || !selectedDistrictCode || !addressData[selectedProvinceCode]) return [];
+    const dist = addressData[selectedProvinceCode]['quan-huyen']?.[selectedDistrictCode];
+    if (!dist || !dist['xa-phuong']) return [];
+    return Object.values(dist['xa-phuong']).sort((a, b) => a.name.localeCompare(b.name));
+  }, [selectedProvinceCode, selectedDistrictCode, addressData]);
 
   const subtotal = getTotalPrice();
   const shippingFee = subtotal >= 1000000 ? 0 : 30000;
@@ -119,21 +157,67 @@ export default function CheckoutPage() {
                     <Input id="receiver_phone" name="receiver_phone" value={newPhone} onChange={e => setNewPhone(e.target.value)} required placeholder="Ví dụ: 0941331046" className="h-11" />
                   </div>
 
+                  <input type="hidden" name="province" value={addressData?.[selectedProvinceCode]?.name_with_type || ''} />
+                  <input type="hidden" name="district" value={addressData?.[selectedProvinceCode]?.['quan-huyen']?.[selectedDistrictCode]?.name_with_type || ''} />
+                  <input type="hidden" name="ward" value={addressData?.[selectedProvinceCode]?.['quan-huyen']?.[selectedDistrictCode]?.['xa-phuong']?.[selectedWardCode]?.name_with_type || ''} />
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="province" className="text-sm font-semibold uppercase tracking-wide">Tỉnh/Thành phố *</Label>
-                      <Input id="province" name="province" required placeholder="Ví dụ: Hà Nội" className="h-11" />
+                      <select 
+                        id="province"
+                        className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        value={selectedProvinceCode}
+                        onChange={(e) => {
+                          setSelectedProvinceCode(e.target.value);
+                          setSelectedDistrictCode('');
+                          setSelectedWardCode('');
+                        }}
+                        required
+                      >
+                        <option value="">Chọn Tỉnh/Thành phố</option>
+                        {provinces.map((p) => (
+                          <option key={p.code} value={p.code}>{p.name_with_type}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="district" className="text-sm font-semibold uppercase tracking-wide">Quận/Huyện *</Label>
-                      <Input id="district" name="district" required placeholder="Ví dụ: Quận Hai Bà Trưng" className="h-11" />
+                      <select 
+                        id="district"
+                        className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        value={selectedDistrictCode}
+                        onChange={(e) => {
+                          setSelectedDistrictCode(e.target.value);
+                          setSelectedWardCode('');
+                        }}
+                        required
+                        disabled={!selectedProvinceCode}
+                      >
+                        <option value="">Chọn Quận/Huyện</option>
+                        {districts.map((d) => (
+                          <option key={d.code} value={d.code}>{d.name_with_type}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="ward" className="text-sm font-semibold uppercase tracking-wide">Xã/Phường/Thị trấn *</Label>
-                      <Input id="ward" name="ward" required placeholder="Ví dụ: Phường Đồng Tâm" className="h-11" />
+                      <select 
+                        id="ward"
+                        className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        value={selectedWardCode}
+                        onChange={(e) => setSelectedWardCode(e.target.value)}
+                        required
+                        disabled={!selectedDistrictCode}
+                      >
+                        <option value="">Chọn Xã/Phường/Thị trấn</option>
+                        {wards.map((w) => (
+                          <option key={w.code} value={w.code}>{w.name_with_type}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="detail_address" className="text-sm font-semibold uppercase tracking-wide">Địa chỉ *</Label>

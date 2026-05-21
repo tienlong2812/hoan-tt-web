@@ -41,20 +41,20 @@ export function OrdersTableClient({ orders }: OrdersTableClientProps) {
   const handlePushGHN = async () => {
     if (selectedIds.size === 0) return;
     setIsPushing(true);
-    
+
     try {
       const orderIds = Array.from(selectedIds);
       const result = await pushOrdersToGHN(orderIds);
-      
+
       if (result.success) {
-        toast.success(`Đẩy GHN thành công ${result.successCount} đơn, thất bại ${result.failCount} đơn.`);
+        toast.success(`Tạo đơn thành công ${result.successCount} đơn, thất bại ${result.failCount} đơn.`);
         setSelectedIds(new Set());
         router.refresh();
       } else {
-        toast.error(result.error || 'Đã có lỗi xảy ra khi đẩy GHN.');
+        toast.error(result.error || 'Đã có lỗi xảy ra khi tạo đơn vận chuyển.');
       }
     } catch (e: any) {
-      toast.error('Lỗi khi gọi tác vụ đẩy GHN: ' + e.message);
+      toast.error('Lỗi khi gọi tác vụ tạo đơn: ' + e.message);
     } finally {
       setIsPushing(false);
     }
@@ -67,7 +67,7 @@ export function OrdersTableClient({ orders }: OrdersTableClientProps) {
           <span className="text-sm font-medium">Đã chọn {selectedIds.size} đơn hàng</span>
           <Button onClick={handlePushGHN} disabled={isPushing} className="gap-2 bg-green-600 hover:bg-green-700">
             <Truck className="h-4 w-4" />
-            {isPushing ? 'Đang đẩy lên GHN...' : 'Xác nhận & Đẩy GHN'}
+            {isPushing ? 'Đang gửi...' : 'Xác nhận giao đơn'}
           </Button>
         </div>
       )}
@@ -76,7 +76,7 @@ export function OrdersTableClient({ orders }: OrdersTableClientProps) {
         <thead className="bg-muted/50 text-muted-foreground border-b border-border">
           <tr>
             <th className="p-4 text-center w-12">
-              <Checkbox 
+              <Checkbox
                 checked={orders.length > 0 && selectedIds.size === orders.length}
                 onCheckedChange={(checked) => handleSelectAll(checked === true)}
                 aria-label="Chọn tất cả"
@@ -96,7 +96,7 @@ export function OrdersTableClient({ orders }: OrdersTableClientProps) {
             orders.map((order) => (
               <tr key={order.order_id} className="hover:bg-muted/30 transition-colors">
                 <td className="p-4 text-center">
-                  <Checkbox 
+                  <Checkbox
                     checked={selectedIds.has(order.order_id)}
                     onCheckedChange={(checked) => handleSelectOne(checked === true, order.order_id)}
                     aria-label={`Chọn đơn ${order.order_id}`}
@@ -123,21 +123,21 @@ export function OrdersTableClient({ orders }: OrdersTableClientProps) {
                   </form>
                   {order.ghn_order_code && (
                     <div className="mt-2 text-xs font-semibold text-green-600 bg-green-50 inline-block px-2 py-0.5 rounded border border-green-200">
-                      GHN: {order.ghn_order_code}
+                      Mã VĐ: {order.ghn_order_code}
                     </div>
                   )}
                   {order.shipping_error && (
                     <div className="mt-2 text-xs font-semibold text-red-600 bg-red-50 inline-block px-2 py-0.5 rounded border border-red-200" title={order.shipping_error}>
-                      Lỗi GHN
+                      Lỗi vận chuyển
                     </div>
                   )}
                 </td>
                 <td className="p-4 text-right">
-                   <Link href={`/admin/orders/${order.order_id}`}>
-                     <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" title="Xem chi tiết">
-                       <Eye className="h-4 w-4" />
-                     </Button>
-                   </Link>
+                  <Link href={`/admin/orders/${order.order_id}`}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" title="Xem chi tiết">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </td>
               </tr>
             ))

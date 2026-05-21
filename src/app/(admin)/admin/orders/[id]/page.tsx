@@ -156,10 +156,10 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
           </AdminPanel>
 
           <AdminPanel>
-            <h2 className="text-lg font-semibold mb-4 border-b pb-2">Vận Chuyển (Giao Hàng Nhanh)</h2>
+            <h2 className="text-lg font-semibold mb-4 border-b pb-2">Đơn Vị Vận Chuyển</h2>
             <div className="space-y-3 text-sm">
               <div>
-                <span className="text-muted-foreground block text-xs">Mã vận đơn GHN</span>
+                <span className="text-muted-foreground block text-xs">Mã vận đơn</span>
                 {order.ghn_order_code ? (
                   <a
                     href={`https://donhang.ghn.vn/?order_code=${order.ghn_order_code}`}
@@ -187,7 +187,7 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
               )}
               {order.shipping_error && (
                 <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-md border border-red-100 text-xs break-words">
-                  <span className="font-semibold block mb-1">Lỗi tạo đơn GHN:</span>
+                  <span className="font-semibold block mb-1">Lỗi kết nối đơn vị vận chuyển:</span>
                   {order.shipping_error}
                 </div>
               )}

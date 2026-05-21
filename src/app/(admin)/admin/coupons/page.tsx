@@ -7,15 +7,31 @@ import { Plus, Tag, Trash2, ToggleLeft } from 'lucide-react';
 import { toggleCouponStatus, deleteCouponAction } from './actions';
 import { AdminPageHeader, AdminTableShell } from '@/components/admin/admin-page';
 import { ConfirmSubmitButton } from '@/components/admin/confirm-submit-button';
+import { AdminPagination } from '@/components/admin/admin-pagination';
 
-export default async function CouponsPage() {
+export default async function CouponsPage(props: {
+  searchParams: Promise<{ page?: string; limit?: string }>;
+}) {
+  const searchParams = await props.searchParams;
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const limit = Number(searchParams.limit) || 20;
+  const fromIndex = (page - 1) * limit;
+  const toIndex = fromIndex + limit - 1;
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
+  // Get total count of coupons
+  const { count: totalItems } = await supabase
+    .from('coupons')
+    .select('*', { count: 'exact', head: true });
+
+  // Get paginated coupons
   const { data: coupons } = await supabase
     .from('coupons')
     .select('*')
-    .order('coupon_id', { ascending: false });
+    .order('coupon_id', { ascending: false })
+    .range(fromIndex, toIndex);
 
   return (
     <>
@@ -101,6 +117,11 @@ export default async function CouponsPage() {
           </tbody>
         </table>
       </AdminTableShell>
+      <AdminPagination
+        totalItems={totalItems || 0}
+        currentPage={page}
+        pageSize={limit}
+      />
     </>
   );
 }
