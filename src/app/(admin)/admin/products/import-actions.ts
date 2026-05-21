@@ -12,6 +12,7 @@ type ProductImportPayload = {
   slug: string;
   base_price: number;
   weight: number | null;
+  stock: number;
   status: string;
   origin: string | null;
   description: string | null;
@@ -31,7 +32,7 @@ function numberFromCell(value: string | number | null | undefined) {
 
 export async function importProductsAction(formData: FormData) {
   const file = formData.get('excelFile') as File | null;
-  
+
   if (!file || file.size === 0) {
     throw new Error("Vui lòng chọn file Excel.");
   }
@@ -63,28 +64,16 @@ export async function importProductsAction(formData: FormData) {
     const productNameText = String(productName);
 
     return {
-<<<<<<< HEAD
       product_name: productNameText,
       slug: generateSlug(productNameText),
       base_price: numberFromCell(row['base_price'] || row['price'] || row['Giá']),
       weight: numberFromCell(row['weight'] || row['Khối lượng']) || null,
+      stock: numberFromCell(row['stock'] || row['Tồn kho'] || row['Tồn Kho']),
       status: String(row['status'] || row['Trạng thái'] || 'active'),
       origin: row['origin'] || row['Xuất xứ'] ? String(row['origin'] || row['Xuất xứ']) : null,
       description: row['description'] || row['Mô tả'] ? String(row['description'] || row['Mô tả']) : null,
       category_id: numberFromCell(row['category_id'] || row['Danh mục ID']) || null,
       brand_id: numberFromCell(row['brand_id'] || row['Thương hiệu ID']) || null,
-=======
-      product_name: productName,
-      slug: generateSlug(productName),
-      base_price: parseInt(row['base_price'] || row['price'] || row['Giá']) || 0,
-      weight: parseFloat(row['weight'] || row['Khối lượng']) || null,
-      stock: parseInt(row['stock'] || row['Tồn kho'] || row['Tồn Kho']) || 0,
-      status: row['status'] || row['Trạng thái'] || 'active',
-      origin: row['origin'] || row['Xuất xứ'] || null,
-      description: row['description'] || row['Mô tả'] || null,
-      category_id: parseInt(row['category_id'] || row['Danh mục ID']) || null,
-      brand_id: parseInt(row['brand_id'] || row['Thương hiệu ID']) || null,
->>>>>>> 0a8a455 (update code)
     };
   }).filter((row): row is ProductImportPayload => row !== null);
 
