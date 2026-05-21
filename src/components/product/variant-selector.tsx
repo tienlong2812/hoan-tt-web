@@ -28,7 +28,7 @@ export function VariantSelector({ product, variants }: { product: any, variants:
   const hasVariants = variants.length > 0;
   const currentPrice = selectedVariant ? selectedVariant.price : product.base_price;
   const currentDiscountPrice = selectedVariant?.discount_price ?? null;
-  const currentStock = selectedVariant ? selectedVariant.stock : (hasVariants ? 0 : 1);
+  const currentStock = selectedVariant ? selectedVariant.stock : (product.stock ?? 0);
   const currentSku = selectedVariant?.sku || null;
 
   // Prepare product object for cart

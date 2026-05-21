@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { withAdminToast } from '@/lib/admin-toast';
 
 type ProductVariantInput = {
+  variant_id?: number;
   variant_name: string;
   sku?: string | null;
   price: number;
@@ -63,6 +64,8 @@ export async function createProductAction(formData: FormData) {
     }
   }
 
+  const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : 0;
+
   // Insert Product
   const newProduct = {
     product_name: productName,
@@ -70,6 +73,7 @@ export async function createProductAction(formData: FormData) {
     description: formData.get('description') as string || null,
     base_price,
     weight,
+    stock,
     status: formData.get('status') as string,
     origin: formData.get('origin') as string || null,
     brand_id,

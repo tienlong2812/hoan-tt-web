@@ -45,10 +45,14 @@ export default async function CreateProductPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="base_price">Giá gốc (VNĐ) *</Label>
                 <Input id="base_price" name="base_price" type="number" required />
+              </div>
+              <div>
+                <Label htmlFor="stock">Tồn kho (Cho SP đơn)</Label>
+                <Input id="stock" name="stock" type="number" defaultValue={0} />
               </div>
               <div>
                 <Label htmlFor="status">Trạng thái</Label>

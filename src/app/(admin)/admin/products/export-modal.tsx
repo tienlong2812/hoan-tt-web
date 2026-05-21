@@ -20,6 +20,7 @@ const EXPORT_FIELDS = [
   { id: 'weight', label: 'Khối Lượng' },
   { id: 'origin', label: 'Nguồn Gốc' },
   { id: 'status', label: 'Trạng Thái' },
+  { id: 'stock', label: 'Tồn Kho' },
   { id: 'created_at', label: 'Ngày Tạo' },
 ];
 

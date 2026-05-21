@@ -16,6 +16,7 @@ type ProductUpdatePayload = {
   brand_id: number | null;
   category_id: number | null;
   thumbnail_url?: string;
+  stock?: number;
 };
 
 type ProductVariantInput = {
@@ -45,12 +46,15 @@ export async function updateProductAction(formData: FormData) {
   const brand_id = formData.get('brand_id') ? parseInt(formData.get('brand_id') as string) : null;
   const category_id = formData.get('category_id') ? parseInt(formData.get('category_id') as string) : null;
 
+  const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : 0;
+
   const updatePayload: ProductUpdatePayload = {
     product_name: productName,
     slug,
     description: formData.get('description') as string || null,
     base_price,
     weight,
+    stock,
     status: formData.get('status') as string,
     origin: formData.get('origin') as string || null,
     brand_id,

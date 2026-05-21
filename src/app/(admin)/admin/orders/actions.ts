@@ -25,9 +25,13 @@ export async function updateOrderStatus(formData: FormData) {
   // Get current order info for additional logic
   const { data: order } = await supabase
     .from('orders')
-    .select('payment_method, payment_status, total_amount')
+    .select('order_status, payment_method, payment_status, total_amount')
     .eq('order_id', order_id)
     .single();
+
+  if (order?.order_status === 'delivered') {
+    redirect(withAdminToast(returnTo, 'Đơn hàng đã giao thành công, không thể thay đổi trạng thái.', 'error'));
+  }
 
   let finalPaymentStatus = payment_status;
 

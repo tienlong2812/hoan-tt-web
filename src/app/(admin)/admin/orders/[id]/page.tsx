@@ -122,7 +122,8 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                 <select 
                   name="status" 
                   defaultValue={order.order_status}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  disabled={order.order_status === 'delivered'}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="pending">Chờ xác nhận</option>
                   <option value="processing">Đang chuẩn bị hàng</option>
@@ -137,7 +138,8 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                 <select 
                   name="payment_status" 
                   defaultValue={order.payment_status}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  disabled={order.order_status === 'delivered'}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="pending">Chờ thanh toán</option>
                   <option value="paid">Đã thanh toán</option>
@@ -146,7 +148,7 @@ export default async function AdminOrderDetailsPage(props: { params: Promise<{ i
                 </select>
               </div>
 
-              <Button type="submit" className="w-full mt-4">
+              <Button type="submit" className="w-full mt-4" disabled={order.order_status === 'delivered'}>
                 <CheckCircle2 className="h-4 w-4 mr-2" /> Lưu Trạng Thái
               </Button>
             </form>
